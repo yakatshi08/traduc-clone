@@ -1,0 +1,60 @@
+{
+  "welcome": {
+    "title": "Bienvenido a TraducXion V2.5",
+    "subtitle": "Plataforma inteligente de transcripción y traducción",
+    "stats": {
+      "users": "{{count}}+ usuarios activos",
+      "languages": "{{count}} idiomas soportados",
+      "accuracy": "WER < {{value}}%"
+    }
+  },
+  "cards": {
+    "totalProjects": {
+      "title": "Proyectos totales",
+      "change": "+{{value}}% este mes"
+    },
+    "inProgress": {
+      "title": "En progreso",
+      "subtitle": "{{count}} completados hoy"
+    },
+    "completed": {
+      "title": "Completados",
+      "change": "+{{value}}% este mes"
+    },
+    "accuracy": {
+      "title": "Precisión promedio",
+      "change": "+{{value}}% este mes"
+    }
+  },
+  "quickActions": {
+    "title": "Acciones rápidas",
+    "newTranscription": "Nueva transcripción",
+    "importFile": "Importar archivo",
+    "recentProjects": "Proyectos recientes",
+    "generateXBRL": "Generar XBRL",
+    "exportXBRL": "Exportar en formato XBRL",
+    "connectDrive": "Conectar Drive",
+    "cloudProviders": "Google Drive, Dropbox",
+    "offlineMode": "Modo sin conexión",
+    "cloudSync": "Sincronización en la nube",
+    "transcriptionDesc": "Iniciar una nueva transcripción"
+  },
+  "viewAllProjects": "Ver todos los proyectos",
+  "aiEngine": {
+    "title": "Motor de IA híbrido de nueva generación",
+    "description": "TraducXion V2.5 utiliza una combinación avanzada de Whisper, Deepgram, ElevenLabs y OpenAI con modelos ajustados para lograr una precisión de transcripción excepcional."
+  },
+  "activity": {
+    "title": "Actividad semanal",
+    "subtitle": "Transcripciones y traducciones",
+    "chart": {
+      "transcriptions": "Transcripciones",
+      "translations": "Traducciones"
+    }
+  },
+  "upload": {
+    "title": "Arrastra tus archivos aquí",
+    "subtitle": "o haz clic para explorar",
+    "button": "Seleccionar archivos"
+  }
+}

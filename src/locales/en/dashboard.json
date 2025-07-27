@@ -1,0 +1,60 @@
+{
+  "welcome": {
+    "title": "Welcome to TraducXion V2.5",
+    "subtitle": "Intelligent Transcription and Translation Platform",
+    "stats": {
+      "users": "{{count}}+ active users",
+      "languages": "{{count}} supported languages",
+      "accuracy": "WER < {{value}}%"
+    }
+  },
+  "cards": {
+    "totalProjects": {
+      "title": "Total Projects",
+      "change": "+{{value}}% this month"
+    },
+    "inProgress": {
+      "title": "In Progress",
+      "subtitle": "{{count}} completed today"
+    },
+    "completed": {
+      "title": "Completed",
+      "change": "+{{value}}% this month"
+    },
+    "accuracy": {
+      "title": "Average Accuracy",
+      "change": "+{{value}}% this month"
+    }
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "newTranscription": "New Transcription",
+    "importFile": "Import File",
+    "recentProjects": "Recent Projects",
+    "generateXBRL": "Generate XBRL",
+    "exportXBRL": "Export to XBRL format",
+    "connectDrive": "Connect Drive",
+    "cloudProviders": "Google Drive, Dropbox",
+    "offlineMode": "Offline Mode",
+    "cloudSync": "Cloud synchronization",
+    "transcriptionDesc": "Start a new transcription"
+  },
+  "viewAllProjects": "View all projects",
+  "aiEngine": {
+    "title": "Next-Generation Hybrid AI Engine",
+    "description": "TraducXion V2.5 uses an advanced combination of Whisper, Deepgram, ElevenLabs and OpenAI with fine-tuned models to achieve exceptional transcription accuracy. Our advanced diarization and contextual analysis system ensures professional results for all your multimedia content."
+  },
+  "activity": {
+    "title": "Weekly Activity",
+    "subtitle": "Transcriptions and translations",
+    "chart": {
+      "transcriptions": "Transcriptions",
+      "translations": "Translations"
+    }
+  },
+  "upload": {
+    "title": "Drag your files here",
+    "subtitle": "or click to browse",
+    "button": "Select files"
+  }
+}

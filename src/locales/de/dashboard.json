@@ -1,0 +1,60 @@
+{
+  "welcome": {
+    "title": "Willkommen bei TraducXion V2.5",
+    "subtitle": "Intelligente Transkriptions- und Übersetzungsplattform",
+    "stats": {
+      "users": "{{count}}+ aktive Benutzer",
+      "languages": "{{count}} unterstützte Sprachen",
+      "accuracy": "WER < {{value}}%"
+    }
+  },
+  "cards": {
+    "totalProjects": {
+      "title": "Gesamtprojekte",
+      "change": "+{{value}}% diesen Monat"
+    },
+    "inProgress": {
+      "title": "In Bearbeitung",
+      "subtitle": "{{count}} heute abgeschlossen"
+    },
+    "completed": {
+      "title": "Abgeschlossen",
+      "change": "+{{value}}% diesen Monat"
+    },
+    "accuracy": {
+      "title": "Durchschnittliche Genauigkeit",
+      "change": "+{{value}}% diesen Monat"
+    }
+  },
+  "quickActions": {
+    "title": "Schnellaktionen",
+    "newTranscription": "Neue Transkription",
+    "importFile": "Datei importieren",
+    "recentProjects": "Aktuelle Projekte",
+    "generateXBRL": "XBRL generieren",
+    "exportXBRL": "In XBRL-Format exportieren",
+    "connectDrive": "Drive verbinden",
+    "cloudProviders": "Google Drive, Dropbox",
+    "offlineMode": "Offline-Modus",
+    "cloudSync": "Cloud-Synchronisation",
+    "transcriptionDesc": "Eine neue Transkription starten"
+  },
+  "viewAllProjects": "Alle Projekte anzeigen",
+  "aiEngine": {
+    "title": "Hybrid-KI-Engine der nächsten Generation",
+    "description": "TraducXion V2.5 nutzt eine fortschrittliche Kombination aus Whisper, Deepgram, ElevenLabs und OpenAI mit fein abgestimmten Modellen."
+  },
+  "activity": {
+    "title": "Wöchentliche Aktivität",
+    "subtitle": "Transkriptionen und Übersetzungen",
+    "chart": {
+      "transcriptions": "Transkriptionen",
+      "translations": "Übersetzungen"
+    }
+  },
+  "upload": {
+    "title": "Dateien hier ablegen",
+    "subtitle": "oder klicken zum Durchsuchen",
+    "button": "Dateien auswählen"
+  }
+}

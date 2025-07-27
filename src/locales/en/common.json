@@ -1,0 +1,18 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "analytics": "Analytics",
+    "documents": "Documents",
+    "videos": "Videos",
+    "audios": "Audios",
+    "cloudStorage": "Cloud Storage",
+    "collaboration": "Collaboration",
+    "aiTools": "AI Tools"
+  },
+  "categories": "Categories",
+  "tools": "Tools",
+  "profile": {
+    "plan": "{{plan}} Plan"
+  }
+}

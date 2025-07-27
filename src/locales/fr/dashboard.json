@@ -1,0 +1,60 @@
+{
+  "welcome": {
+    "title": "Bienvenue sur TraducXion V2.5",
+    "subtitle": "Plateforme intelligente de transcription et traduction",
+    "stats": {
+      "users": "{{count}}+ utilisateurs actifs",
+      "languages": "{{count}} langues supportées",
+      "accuracy": "WER < {{value}}%"
+    }
+  },
+  "cards": {
+    "totalProjects": {
+      "title": "Projets totaux",
+      "change": "+{{value}}% ce mois"
+    },
+    "inProgress": {
+      "title": "En cours",
+      "subtitle": "{{count}} terminés aujourd'hui"
+    },
+    "completed": {
+      "title": "Terminés",
+      "change": "+{{value}}% ce mois"
+    },
+    "accuracy": {
+      "title": "Précision moyenne",
+      "change": "+{{value}}% ce mois"
+    }
+  },
+  "quickActions": {
+    "title": "Actions rapides",
+    "newTranscription": "Nouvelle transcription",
+    "importFile": "Importer un fichier",
+    "recentProjects": "Projets récents",
+    "generateXBRL": "Générer XBRL",
+    "exportXBRL": "Exporter au format XBRL",
+    "connectDrive": "Connecter Drive",
+    "cloudProviders": "Google Drive, Dropbox",
+    "offlineMode": "Mode Offline",
+    "cloudSync": "Synchronisation cloud",
+    "transcriptionDesc": "Commencer une nouvelle transcription"
+  },
+  "viewAllProjects": "Voir tous les projets",
+  "aiEngine": {
+    "title": "Moteur IA Hybride Nouvelle Génération",
+    "description": "TraducXion V2.5 utilise une combinaison avancée de Whisper, Deepgram, ElevenLabs et OpenAI avec des modèles fine-tunés pour atteindre une précision de transcription exceptionnelle. Notre système de diarisation avancée et d'analyse contextuelle garantit des résultats professionnels pour tous vos contenus multimédias."
+  },
+  "activity": {
+    "title": "Activité de la semaine",
+    "subtitle": "Transcriptions et traductions",
+    "chart": {
+      "transcriptions": "Transcriptions",
+      "translations": "Traductions"
+    }
+  },
+  "upload": {
+    "title": "Glissez vos fichiers ici",
+    "subtitle": "ou cliquez pour parcourir",
+    "button": "Sélectionner des fichiers"
+  }
+}

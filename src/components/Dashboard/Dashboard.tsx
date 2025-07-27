@@ -1,240 +1,208 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
-  FolderOpen, 
-  Clock, 
-  CheckCircle, 
   TrendingUp, 
   Users, 
-  Globe,
+  Globe, 
   Zap,
-  HardDrive
+  Upload,
+  FolderOpen,
+  Clock,
+  CheckCircle,
+  Activity,
+  FileText,
+  Video,
+  Headphones,
+  MoreVertical
 } from 'lucide-react';
-import { useLanguage } from '../../hooks/useLanguage';
 import StatsCard from './StatsCard';
-import ProjectCard from './ProjectCard';
-import UploadZone from './UploadZone';
-import { Project } from '../../types';
+import RecentProject from './RecentProject';
+import ActivityChart from './ActivityChart';
 
-interface DashboardProps {
-  onProjectSelect: (project: Project) => void;
-}
+const Dashboard: React.FC = () => {
+  const { t } = useTranslation(['dashboard', 'common']);
 
-const Dashboard: React.FC<DashboardProps> = ({ onProjectSelect }) => {
-  const { t } = useLanguage();
-
-  // Mock data
   const stats = [
     {
-      title: 'Projets totaux',
+      title: t('dashboard:cards.totalProjects.title'),
       value: '1,247',
-      change: '+12% ce mois',
-      changeType: 'positive' as const,
+      change: '+12%',
+      changeLabel: t('dashboard:cards.totalProjects.change', { value: 12 }),
       icon: FolderOpen,
-      iconColor: 'text-violet-400'
+      color: 'from-violet-600 to-indigo-600',
+      bgColor: 'bg-violet-500/10'
     },
     {
-      title: 'En cours',
+      title: t('dashboard:cards.inProgress.title'),
       value: '23',
-      change: '5 terminés aujourd\'hui',
-      changeType: 'positive' as const,
+      change: '5',
+      changeLabel: t('dashboard:cards.inProgress.subtitle', { count: 5 }),
       icon: Clock,
-      iconColor: 'text-blue-400'
+      color: 'from-blue-600 to-cyan-600',
+      bgColor: 'bg-blue-500/10'
     },
     {
-      title: 'Terminés',
+      title: t('dashboard:cards.completed.title'),
       value: '1,224',
-      change: '+8% ce mois',
-      changeType: 'positive' as const,
+      change: '+8%',
+      changeLabel: t('dashboard:cards.completed.change', { value: 8 }),
       icon: CheckCircle,
-      iconColor: 'text-emerald-400'
+      color: 'from-emerald-600 to-green-600',
+      bgColor: 'bg-emerald-500/10'
     },
     {
-      title: 'Précision moyenne',
+      title: t('dashboard:cards.accuracy.title'),
       value: '96.2%',
-      change: '+0.3% ce mois',
-      changeType: 'positive' as const,
+      change: '+0.3%',
+      changeLabel: t('dashboard:cards.accuracy.change', { value: 0.3 }),
       icon: TrendingUp,
-      iconColor: 'text-green-400'
+      color: 'from-orange-600 to-red-600',
+      bgColor: 'bg-orange-500/10'
     }
   ];
 
-  const recentProjects: Project[] = [
+  const recentProjects = [
     {
-      id: '1',
+      id: 1,
       name: 'Conférence Q4 2024',
-      type: 'video',
-      status: 'completed',
-      language: 'fr',
-      targetLanguages: ['en', 'es'],
-      createdAt: new Date('2024-12-15'),
-      updatedAt: new Date('2024-12-15'),
-      fileSize: 125000000,
-      accuracy: 97.5,
-      sector: 'business'
+      type: 'video' as const,
+      status: 'completed' as const,
+      progress: 100,
+      date: '15 Dec 2024',
+      size: '125 MB'
     },
     {
-      id: '2',
+      id: 2,
       name: 'Interview Client ABC',
-      type: 'audio',
-      status: 'processing',
-      language: 'en',
-      targetLanguages: ['fr', 'de'],
-      createdAt: new Date('2024-12-14'),
-      updatedAt: new Date('2024-12-14'),
-      fileSize: 45000000,
-      sector: 'business'
+      type: 'audio' as const,
+      status: 'processing' as const,
+      progress: 65,
+      date: '14 Dec 2024',
+      size: '45 MB'
     },
     {
-      id: '3',
+      id: 3,
       name: 'Rapport médical 2024',
-      type: 'document',
-      status: 'ready',
-      language: 'fr',
-      targetLanguages: ['en'],
-      createdAt: new Date('2024-12-13'),
-      updatedAt: new Date('2024-12-13'),
-      fileSize: 2500000,
-      accuracy: 98.1,
-      sector: 'medical'
-    },
-    {
-      id: '4',
-      name: 'Formation juridique',
-      type: 'video',
-      status: 'error',
-      language: 'fr',
-      targetLanguages: ['en', 'it'],
-      createdAt: new Date('2024-12-12'),
-      updatedAt: new Date('2024-12-12'),
-      fileSize: 890000000,
-      sector: 'legal'
+      type: 'document' as const,
+      status: 'ready' as const,
+      progress: 100,
+      date: '13 Dec 2024',
+      size: '2.5 MB'
     }
   ];
-
-  const handleFileUpload = (files: File[]) => {
-    console.log('Files uploaded:', files);
-    // Here you would typically send files to your backend
-  };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 animate-fadeIn">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-xl p-8 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{t('welcome.title')}</h1>
-            <p className="text-violet-100 text-lg">{t('welcome.subtitle')}</p>
-            <div className="mt-4 flex items-center space-x-6 text-sm">
-              <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4" />
-                <span>20K+ utilisateurs actifs</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Globe className="w-4 h-4" />
-                <span>5 langues supportées</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Zap className="w-4 h-4" />
-                <span>WER &lt; 4%</span>
-              </div>
+      <div className="relative overflow-hidden bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-8 shadow-2xl">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24" />
+        
+        <div className="relative z-10">
+          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">
+            {t('dashboard:welcome.title')}
+          </h1>
+          <p className="text-violet-100 text-lg mb-6 max-w-2xl">
+            {t('dashboard:welcome.subtitle')}
+          </p>
+          
+          <div className="flex flex-wrap gap-6 text-white/90">
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              <span>{t('dashboard:welcome.stats.users', { count: '20K' })}</span>
             </div>
-          </div>
-          <div className="hidden lg:block">
-            <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
-                <Zap className="w-10 h-10 text-white" />
-              </div>
+            <div className="flex items-center gap-2">
+              <Globe className="w-5 h-5" />
+              <span>{t('dashboard:welcome.stats.languages', { count: 5 })}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5" />
+              <span>{t('dashboard:welcome.stats.accuracy', { value: 4 })}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
       </div>
 
-      {/* Upload Zone */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <UploadZone onFileUpload={handleFileUpload} />
-        </div>
-        
-        {/* Quick Actions */}
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Actions rapides</h3>
-          <div className="space-y-3">
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors text-left">
-              <div className="p-2 rounded-lg bg-emerald-500/20">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">Générer XBRL</p>
-                <p className="text-xs text-gray-400">Exporter au format XBRL</p>
-              </div>
-            </button>
-            
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors text-left">
-              <div className="p-2 rounded-lg bg-blue-500/20">
-                <Globe className="w-4 h-4 text-blue-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">Connecter Drive</p>
-                <p className="text-xs text-gray-400">Google Drive, Dropbox</p>
-              </div>
-            </button>
-            
-            <button className="w-full flex items-center space-x-3 p-3 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors text-left">
-              <div className="p-2 rounded-lg bg-purple-500/20">
-                <HardDrive className="w-4 h-4 text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-white">Mode Offline</p>
-                <p className="text-xs text-gray-400">Synchronisation cloud</p>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Projects */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Projets récents</h2>
-          <button className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
-            Voir tous les projets →
-          </button>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {recentProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onSelect={onProjectSelect}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Info Box */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
-        <div className="flex items-start space-x-4">
-          <div className="p-2 rounded-lg bg-blue-500/20">
-            <Zap className="w-5 h-5 text-blue-400" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-blue-300 mb-2">
-              Moteur IA Hybride Nouvelle Génération
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upload Section */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Upload Zone */}
+          <div className="bg-slate-800/50 backdrop-blur-sm border-2 border-dashed border-slate-600 rounded-2xl p-8 text-center hover:border-violet-500 transition-colors group">
+            <div className="w-16 h-16 mx-auto mb-4 bg-violet-500/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Upload className="w-8 h-8 text-violet-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">
+              {t('dashboard:upload.title', 'Glissez vos fichiers ici')}
             </h3>
-            <p className="text-blue-200 text-sm leading-relaxed">
-              TraducXion V2.5 utilise une combinaison avancée de Whisper, Deepgram, ElevenLabs et OpenAI 
-              avec des modèles fine-tunés pour atteindre une précision de transcription exceptionnelle. 
-              Notre système de diarisation avancée et d'analyse contextuelle garantit des résultats 
-              professionnels pour tous vos contenus multimédias.
+            <p className="text-gray-400 mb-4">
+              {t('dashboard:upload.subtitle', 'ou cliquez pour parcourir')}
             </p>
+            <button className="px-6 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all">
+              {t('dashboard:upload.button', 'Sélectionner des fichiers')}
+            </button>
+          </div>
+
+          {/* Activity Chart */}
+          <ActivityChart />
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Quick Actions */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+            <h3 className="text-lg font-semibold text-white mb-4">
+              {t('dashboard:quickActions.title')}
+            </h3>
+            <div className="space-y-3">
+              <button className="w-full p-4 bg-gradient-to-r from-emerald-600/20 to-green-600/20 hover:from-emerald-600/30 hover:to-green-600/30 rounded-xl text-left transition-all group">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">{t('dashboard:quickActions.newTranscription')}</p>
+                    <p className="text-sm text-gray-400">{t('dashboard:quickActions.transcriptionDesc', 'Commencer une nouvelle transcription')}</p>
+                  </div>
+                </div>
+              </button>
+
+              <button className="w-full p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 hover:from-blue-600/30 hover:to-cyan-600/30 rounded-xl text-left transition-all group">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Globe className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">{t('dashboard:quickActions.connectDrive')}</p>
+                    <p className="text-sm text-gray-400">{t('dashboard:quickActions.cloudProviders')}</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Recent Projects */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">
+                {t('dashboard:quickActions.recentProjects')}
+              </h3>
+              <button className="p-1 hover:bg-slate-700 rounded-lg transition-colors">
+                <MoreVertical className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              {recentProjects.map((project) => (
+                <RecentProject key={project.id} {...project} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

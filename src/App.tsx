@@ -1,58 +1,67 @@
 import React, { useState } from 'react';
-import { useLanguage } from './hooks/useLanguage';
+import { useTranslation } from 'react-i18next';
 import Header from './components/Layout/Header';
 import Sidebar from './components/Layout/Sidebar';
 import Dashboard from './components/Dashboard/Dashboard';
-import { Project } from './types';
+import './i18n/config';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const { t } = useLanguage();
-
-  const handleProjectSelect = (project: Project) => {
-    setSelectedProject(project);
-    // You could navigate to a project detail view here
-    console.log('Selected project:', project);
-  };
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { t } = useTranslation();
 
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard onProjectSelect={handleProjectSelect} />;
+        return <Dashboard />;
       case 'projects':
         return (
-          <div className="text-white">
-            <h1 className="text-2xl font-bold mb-4">Projets</h1>
-            <p>Vue détaillée des projets à venir...</p>
+          <div className="animate-fadeIn">
+            <h1 className="text-3xl font-bold text-white mb-4">{t('pages.projects.title', 'Projets')}</h1>
+            <p className="text-gray-400">{t('pages.projects.description', 'Gérez vos projets de transcription et traduction')}</p>
           </div>
         );
       case 'analytics':
         return (
-          <div className="text-white">
-            <h1 className="text-2xl font-bold mb-4">Analytiques</h1>
-            <p>Tableaux de bord analytiques à venir...</p>
+          <div className="animate-fadeIn">
+            <h1 className="text-3xl font-bold text-white mb-4">{t('pages.analytics.title', 'Analytiques')}</h1>
+            <p className="text-gray-400">{t('pages.analytics.description', 'Visualisez vos statistiques détaillées')}</p>
           </div>
         );
       case 'settings':
         return (
-          <div className="text-white">
-            <h1 className="text-2xl font-bold mb-4">Paramètres</h1>
-            <p>Configuration de l'application à venir...</p>
+          <div className="animate-fadeIn">
+            <h1 className="text-3xl font-bold text-white mb-4">{t('pages.settings.title', 'Paramètres')}</h1>
+            <p className="text-gray-400">{t('pages.settings.description', 'Configurez votre espace de travail')}</p>
           </div>
         );
       default:
-        return <Dashboard onProjectSelect={handleProjectSelect} />;
+        return <Dashboard />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col overflow-hidden">
-      <Header activeTab={activeTab} onTabChange={setActiveTab} />
-      <div className="flex flex-1 overflow-hidden h-full">
-        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 overflow-y-auto h-full">
-          <div className="p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <Header 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
+      
+      {/* Main Layout */}
+      <div className="flex h-screen pt-16">
+        {/* Sidebar */}
+        <Sidebar 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab}
+          isOpen={sidebarOpen}
+        />
+        
+        {/* Main Content */}
+        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} overflow-y-auto`}>
+          <div className="p-4 lg:p-8 max-w-7xl mx-auto">
             {renderContent()}
           </div>
         </main>
