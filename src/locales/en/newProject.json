@@ -1,0 +1,173 @@
+{
+  "title": "New Project",
+  "subtitle": "Configure your transcription and translation project",
+  "step": "Step",
+  "steps": {
+    "upload": "Upload",
+    "languages": "Languages",
+    "settings": "Settings",
+    "review": "Summary"
+  },
+  "navigation": {
+    "previous": "Previous",
+    "next": "Next",
+    "cancel": "Cancel",
+    "start": "Start transcription"
+  },
+  "fileTypes": {
+    "documents": {
+      "title": "Documents",
+      "formats": "PDF, DOCX, TXT, ODT"
+    },
+    "videos": {
+      "title": "Videos",
+      "formats": "MP4, AVI, MOV, MKV"
+    },
+    "audio": {
+      "title": "Audio",
+      "formats": "MP3, WAV, M4A, FLAC"
+    }
+  },
+  "upload": {
+    "dragDrop": "Drag and drop your files here",
+    "dropHere": "Drop files here",
+    "or": "or",
+    "browse": "browse",
+    "maxSize": "Max size: 2GB per file",
+    "supportedFormats": "Supported formats",
+    "importFromCloud": "Import from cloud",
+    "uploadedFiles": "Uploaded files",
+    "totalFiles": "Total files",
+    "totalSize": "Total size",
+    "status": {
+      "pending": "Pending",
+      "analyzing": "Analyzing",
+      "ready": "Ready",
+      "error": "Error"
+    }
+  },
+  "cloudConnector": {
+    "title": "Import from {{provider}}",
+    "subtitle": "Select files to import",
+    "authRequired": "Connection required",
+    "authDescription": "Sign in to {{provider}} to access your files",
+    "connectButton": "Connect to {{provider}}",
+    "searchPlaceholder": "Search files...",
+    "noFiles": "No files found",
+    "selectedCount": "{{count}} file(s) selected",
+    "importButton": "Import",
+    "filter": {
+      "all": "All",
+      "documents": "Documents",
+      "videos": "Videos",
+      "audio": "Audio"
+    }
+  },
+  "languages": {
+    "sourceLanguage": "Source language",
+    "targetLanguages": "Target languages",
+    "auto": "Auto-detect",
+    "source": "Source",
+    "selectAll": "Select all",
+    "clearAll": "Clear all",
+    "detectedLanguages": "Detected languages",
+    "useSuggested": "Use {{language}} as source language",
+    "noTargetSelected": "Please select at least one target language for translation",
+    "translationFlow": "Translation flow",
+    "infoBox": "Our system automatically detects the language of your files. You can select up to 5 target languages for simultaneous translation."
+  },
+  "settings": {
+    "engineSelection": "AI Engine Selection",
+    "qualityLevel": "Quality Level",
+    "sectorPresets": "Sector Presets",
+    "advancedOptions": "Advanced Options",
+    "accuracy": "Accuracy",
+    "speed": "Speed",
+    "infoBox": "Settings are automatically optimized based on your files and industry sector.",
+    "engines": {
+      "auto": {
+        "name": "Automatic selection",
+        "description": "System chooses the best engine for your files"
+      },
+      "whisper": {
+        "description": "Excellent for multilingual and high accuracy"
+      },
+      "deepgram": {
+        "description": "Ideal for real-time transcription"
+      },
+      "elevenlabs": {
+        "description": "Optimized for natural voice synthesis"
+      }
+    },
+    "quality": {
+      "fast": {
+        "name": "Fast",
+        "description": "Accelerated processing"
+      },
+      "balanced": {
+        "name": "Balanced",
+        "description": "Best compromise"
+      },
+      "high": {
+        "name": "High precision",
+        "description": "Maximum quality"
+      }
+    },
+    "sectors": {
+      "general": "General",
+      "medical": "Medical",
+      "legal": "Legal",
+      "business": "Business",
+      "education": "Education",
+      "technical": "Technical"
+    },
+    "options": {
+      "speakerDiarization": "Speaker diarization",
+      "speakerDiarizationDesc": "Identify and separate different speakers",
+      "punctuation": "Automatic punctuation",
+      "punctuationDesc": "Automatically add punctuation",
+      "timestamps": "Timestamps",
+      "timestampsDesc": "Include time markers",
+      "summarization": "Automatic summary",
+      "summarizationDesc": "Generate content summary",
+      "confidenceThreshold": "Confidence threshold",
+      "confidenceThresholdDesc": "Minimum certainty level for transcription"
+    },
+    "features": {
+      "smart-selection": "Smart selection",
+      "best-accuracy": "Best accuracy",
+      "multilingual": "Multilingual",
+      "high-accuracy": "High accuracy",
+      "real-time": "Real-time",
+      "fast": "Fast",
+      "voice-synthesis": "Voice synthesis",
+      "natural": "Natural"
+    }
+  },
+  "summary": {
+    "projectName": "Project name",
+    "projectNamePlaceholder": "E.g.: Q4 2024 Conference",
+    "files": "Files",
+    "languages": "Languages",
+    "settings": "Settings",
+    "estimation": "Estimation",
+    "sourceLanguage": "Source language",
+    "targetLanguages": "Target languages",
+    "engine": "AI Engine",
+    "quality": "Quality",
+    "sector": "Sector",
+    "estimatedTime": "Estimated time",
+    "minutesUsed": "Minutes used",
+    "additionalCost": "Additional cost",
+    "included": "Included",
+    "plan": "{{plan}} Plan",
+    "quotaExceeded": "Quota exceeded",
+    "quotaExceededDesc": "You exceed your quota by {{overage}} minutes. Additional cost: {{cost}}€",
+    "upgradePlan": "Upgrade your plan",
+    "aiFeatures": "AI features enabled",
+    "totalFiles": "Total files",
+    "totalSize": "Total size",
+    "info": "Your files will be processed according to the chosen settings",
+    "startButton": "Start transcription"
+  }
+}

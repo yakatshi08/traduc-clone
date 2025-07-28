@@ -1,0 +1,90 @@
+{
+  "title": "Projets",
+  "subtitle": "{{count}} projets trouvés",
+  "newProject": "Nouveau projet",
+  "import": "Importer",
+  "export": "Exporter",
+  "searchPlaceholder": "Rechercher un projet...",
+  "filters": "Filtres",
+  "selectedCount": "{{count}} projet(s) sélectionné(s)",
+  "noOwner": "Non assigné",
+  "progress": "Progression",
+  "accuracy": "Précision",
+  "duration": "Durée",
+  "table": {
+    "name": "Nom",
+    "type": "Type",
+    "status": "Statut",
+    "date": "Date",
+    "accuracy": "Précision",
+    "actions": "Actions"
+  },
+  "type": {
+    "document": "Document",
+    "video": "Vidéo",
+    "audio": "Audio"
+  },
+  "status": {
+    "completed": "Terminé",
+    "processing": "En cours",
+    "ready": "Prêt",
+    "error": "Erreur"
+  },
+  "actions": {
+    "view": "Voir",
+    "edit": "Éditer",
+    "download": "Télécharger",
+    "share": "Partager",
+    "delete": "Supprimer"
+  },
+  "bulkActions": {
+    "delete": "Supprimer",
+    "export": "Exporter",
+    "archive": "Archiver"
+  },
+  "pagination": {
+    "showing": "Affichage de {{start}} à {{end}} sur {{total}} résultats"
+  },
+  "filters": {
+    "title": "Filtres avancés",
+    "reset": "Réinitialiser",
+    "active": "Filtres actifs",
+    "statusLabel": "Statut",
+    "typeLabel": "Type",
+    "languageLabel": "Langue",
+    "dateLabel": "Période",
+    "sectorLabel": "Secteur",
+    "status": {
+      "all": "Tous les statuts",
+      "completed": "Terminé",
+      "processing": "En cours",
+      "ready": "Prêt",
+      "error": "Erreur"
+    },
+    "type": {
+      "all": "Tous les types",
+      "document": "Document",
+      "video": "Vidéo",
+      "audio": "Audio"
+    },
+    "language": {
+      "all": "Toutes les langues"
+    },
+    "dateRange": {
+      "all": "Toutes les dates",
+      "today": "Aujourd'hui",
+      "week": "Cette semaine",
+      "month": "Ce mois",
+      "quarter": "Ce trimestre",
+      "year": "Cette année"
+    },
+    "sector": {
+      "all": "Tous les secteurs",
+      "business": "Business",
+      "medical": "Médical",
+      "legal": "Juridique",
+      "education": "Éducation",
+      "technical": "Technique"
+    }
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "title": "Neues Projekt",
+  "subtitle": "Konfigurieren Sie Ihr Transkriptions- und Übersetzungsprojekt",
+  "step": "Schritt",
+  "steps": {
+    "upload": "Hochladen",
+    "languages": "Sprachen",
+    "settings": "Einstellungen",
+    "review": "Zusammenfassung"
+  },
+  "navigation": {
+    "previous": "Zurück",
+    "next": "Weiter",
+    "cancel": "Abbrechen",
+    "start": "Transkription starten"
+  },
+  "fileTypes": {
+    "documents": {
+      "title": "Dokumente",
+      "formats": "PDF, DOCX, TXT, ODT"
+    },
+    "videos": {
+      "title": "Videos",
+      "formats": "MP4, AVI, MOV, MKV"
+    },
+    "audio": {
+      "title": "Audio",
+      "formats": "MP3, WAV, M4A, FLAC"
+    }
+  },
+  "upload": {
+    "dragDrop": "Dateien hier hineinziehen und ablegen",
+    "dropHere": "Dateien hier ablegen",
+    "or": "oder",
+    "browse": "durchsuchen",
+    "maxSize": "Max. Größe: 2GB pro Datei",
+    "supportedFormats": "Unterstützte Formate",
+    "importFromCloud": "Aus Cloud importieren",
+    "uploadedFiles": "Hochgeladene Dateien",
+    "totalFiles": "Dateien gesamt",
+    "totalSize": "Gesamtgröße",
+    "status": {
+      "pending": "Ausstehend",
+      "analyzing": "Wird analysiert",
+      "ready": "Bereit",
+      "error": "Fehler"
+    }
+  },
+  "cloudConnector": {
+    "title": "Von {{provider}} importieren",
+    "subtitle": "Wählen Sie die zu importierenden Dateien",
+    "authRequired": "Verbindung erforderlich",
+    "authDescription": "Melden Sie sich bei {{provider}} an, um auf Ihre Dateien zuzugreifen",
+    "connectButton": "Mit {{provider}} verbinden",
+    "searchPlaceholder": "Dateien suchen...",
+    "noFiles": "Keine Dateien gefunden",
+    "selectedCount": "{{count}} Datei(en) ausgewählt",
+    "importButton": "Importieren",
+    "filter": {
+      "all": "Alle",
+      "documents": "Dokumente",
+      "videos": "Videos",
+      "audio": "Audio"
+    }
+  },
+  "languages": {
+    "sourceLanguage": "Ausgangssprache",
+    "targetLanguages": "Zielsprachen",
+    "auto": "Automatische Erkennung",
+    "source": "Quelle",
+    "selectAll": "Alle auswählen",
+    "clearAll": "Alle löschen",
+    "detectedLanguages": "Erkannte Sprachen",
+    "useSuggested": "{{language}} als Ausgangssprache verwenden",
+    "noTargetSelected": "Bitte wählen Sie mindestens eine Zielsprache für die Übersetzung",
+    "translationFlow": "Übersetzungsfluss",
+    "infoBox": "Unser System erkennt automatisch die Sprache Ihrer Dateien. Sie können bis zu 5 Zielsprachen für die gleichzeitige Übersetzung auswählen."
+  },
+  "settings": {
+    "engineSelection": "KI-Engine-Auswahl",
+    "qualityLevel": "Qualitätsstufe",
+    "sectorPresets": "Branchenvoreinstellungen",
+    "advancedOptions": "Erweiterte Optionen",
+    "accuracy": "Genauigkeit",
+    "speed": "Geschwindigkeit",
+    "infoBox": "Die Einstellungen werden automatisch basierend auf Ihren Dateien und Ihrer Branche optimiert.",
+    "engines": {
+      "auto": {
+        "name": "Automatische Auswahl",
+        "description": "System wählt die beste Engine für Ihre Dateien"
+      },
+      "whisper": {
+        "description": "Hervorragend für Mehrsprachigkeit und hohe Genauigkeit"
+      },
+      "deepgram": {
+        "description": "Ideal für Echtzeit-Transkription"
+      },
+      "elevenlabs": {
+        "description": "Optimiert für natürliche Sprachsynthese"
+      }
+    },
+    "quality": {
+      "fast": {
+        "name": "Schnell",
+        "description": "Beschleunigte Verarbeitung"
+      },
+      "balanced": {
+        "name": "Ausgewogen",
+        "description": "Bester Kompromiss"
+      },
+      "high": {
+        "name": "Hohe Präzision",
+        "description": "Maximale Qualität"
+      }
+    },
+    "sectors": {
+      "general": "Allgemein",
+      "medical": "Medizinisch",
+      "legal": "Rechtlich",
+      "business": "Geschäft",
+      "education": "Bildung",
+      "technical": "Technisch"
+    },
+    "options": {
+      "speakerDiarization": "Sprecherdiarisierung",
+      "speakerDiarizationDesc": "Verschiedene Sprecher identifizieren und trennen",
+      "punctuation": "Automatische Interpunktion",
+      "punctuationDesc": "Satzzeichen automatisch hinzufügen",
+      "timestamps": "Zeitstempel",
+      "timestampsDesc": "Zeitmarkierungen einschließen",
+      "summarization": "Automatische Zusammenfassung",
+      "summarizationDesc": "Inhaltszusammenfassung generieren",
+      "confidenceThreshold": "Konfidenzschwelle",
+      "confidenceThresholdDesc": "Mindestsicherheitsniveau für die Transkription"
+    },
+    "features": {
+      "smart-selection": "Intelligente Auswahl",
+      "best-accuracy": "Beste Genauigkeit",
+      "multilingual": "Mehrsprachig",
+      "high-accuracy": "Hohe Genauigkeit",
+      "real-time": "Echtzeit",
+      "fast": "Schnell",
+      "voice-synthesis": "Sprachsynthese",
+      "natural": "Natürlich"
+    }
+  },
+  "summary": {
+    "projectName": "Projektname",
+    "projectNamePlaceholder": "Z.B.: Konferenz Q4 2024",
+    "files": "Dateien",
+    "languages": "Sprachen",
+    "settings": "Einstellungen",
+    "estimation": "Schätzung",
+    "sourceLanguage": "Ausgangssprache",
+    "targetLanguages": "Zielsprachen",
+    "engine": "KI-Engine",
+    "quality": "Qualität",
+    "sector": "Sektor",
+    "estimatedTime": "Geschätzte Zeit",
+    "minutesUsed": "Verwendete Minuten",
+    "additionalCost": "Zusätzliche Kosten",
+    "included": "Inbegriffen",
+    "plan": "{{plan}} Plan",
+    "quotaExceeded": "Kontingent überschritten",
+    "quotaExceededDesc": "Sie überschreiten Ihr Kontingent um {{overage}} Minuten. Zusätzliche Kosten: {{cost}}€",
+    "upgradePlan": "Plan upgraden",
+    "aiFeatures": "Aktivierte KI-Funktionen",
+    "totalFiles": "Dateien gesamt",
+    "totalSize": "Gesamtgröße",
+    "info": "Ihre Dateien werden gemäß den gewählten Einstellungen verarbeitet",
+    "startButton": "Transkription starten"
+  }
+}

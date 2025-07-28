@@ -1,0 +1,90 @@
+{
+  "title": "Projects",
+  "subtitle": "{{count}} projects found",
+  "newProject": "New project",
+  "import": "Import",
+  "export": "Export",
+  "searchPlaceholder": "Search projects...",
+  "filters": "Filters",
+  "selectedCount": "{{count}} project(s) selected",
+  "noOwner": "Unassigned",
+  "progress": "Progress",
+  "accuracy": "Accuracy",
+  "duration": "Duration",
+  "table": {
+    "name": "Name",
+    "type": "Type",
+    "status": "Status",
+    "date": "Date",
+    "accuracy": "Accuracy",
+    "actions": "Actions"
+  },
+  "type": {
+    "document": "Document",
+    "video": "Video",
+    "audio": "Audio"
+  },
+  "status": {
+    "completed": "Completed",
+    "processing": "Processing",
+    "ready": "Ready",
+    "error": "Error"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit",
+    "download": "Download",
+    "share": "Share",
+    "delete": "Delete"
+  },
+  "bulkActions": {
+    "delete": "Delete",
+    "export": "Export",
+    "archive": "Archive"
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} results"
+  },
+  "filters": {
+    "title": "Advanced filters",
+    "reset": "Reset",
+    "active": "Active filters",
+    "statusLabel": "Status",
+    "typeLabel": "Type",
+    "languageLabel": "Language",
+    "dateLabel": "Period",
+    "sectorLabel": "Sector",
+    "status": {
+      "all": "All statuses",
+      "completed": "Completed",
+      "processing": "Processing",
+      "ready": "Ready",
+      "error": "Error"
+    },
+    "type": {
+      "all": "All types",
+      "document": "Document",
+      "video": "Video",
+      "audio": "Audio"
+    },
+    "language": {
+      "all": "All languages"
+    },
+    "dateRange": {
+      "all": "All dates",
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "quarter": "This quarter",
+      "year": "This year"
+    },
+    "sector": {
+      "all": "All sectors",
+      "business": "Business",
+      "medical": "Medical",
+      "legal": "Legal",
+      "education": "Education",
+      "technical": "Technical"
+    }
+  }
+}

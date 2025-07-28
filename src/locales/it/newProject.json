@@ -1,0 +1,173 @@
+{
+  "title": "Nuovo Progetto",
+  "subtitle": "Configura il tuo progetto di trascrizione e traduzione",
+  "step": "Passo",
+  "steps": {
+    "upload": "Caricamento",
+    "languages": "Lingue",
+    "settings": "Impostazioni",
+    "review": "Riepilogo"
+  },
+  "navigation": {
+    "previous": "Precedente",
+    "next": "Successivo",
+    "cancel": "Annulla",
+    "start": "Avvia trascrizione"
+  },
+  "fileTypes": {
+    "documents": {
+      "title": "Documenti",
+      "formats": "PDF, DOCX, TXT, ODT"
+    },
+    "videos": {
+      "title": "Video",
+      "formats": "MP4, AVI, MOV, MKV"
+    },
+    "audio": {
+      "title": "Audio",
+      "formats": "MP3, WAV, M4A, FLAC"
+    }
+  },
+  "upload": {
+    "dragDrop": "Trascina e rilascia i tuoi file qui",
+    "dropHere": "Rilascia i file qui",
+    "or": "o",
+    "browse": "sfoglia",
+    "maxSize": "Dimensione max: 2GB per file",
+    "supportedFormats": "Formati supportati",
+    "importFromCloud": "Importa dal cloud",
+    "uploadedFiles": "File caricati",
+    "totalFiles": "File totali",
+    "totalSize": "Dimensione totale",
+    "status": {
+      "pending": "In attesa",
+      "analyzing": "Analisi in corso",
+      "ready": "Pronto",
+      "error": "Errore"
+    }
+  },
+  "cloudConnector": {
+    "title": "Importa da {{provider}}",
+    "subtitle": "Seleziona i file da importare",
+    "authRequired": "Connessione richiesta",
+    "authDescription": "Accedi a {{provider}} per accedere ai tuoi file",
+    "connectButton": "Connetti a {{provider}}",
+    "searchPlaceholder": "Cerca file...",
+    "noFiles": "Nessun file trovato",
+    "selectedCount": "{{count}} file selezionato/i",
+    "importButton": "Importa",
+    "filter": {
+      "all": "Tutti",
+      "documents": "Documenti",
+      "videos": "Video",
+      "audio": "Audio"
+    }
+  },
+  "languages": {
+    "sourceLanguage": "Lingua di origine",
+    "targetLanguages": "Lingue di destinazione",
+    "auto": "Rilevamento automatico",
+    "source": "Origine",
+    "selectAll": "Seleziona tutto",
+    "clearAll": "Cancella tutto",
+    "detectedLanguages": "Lingue rilevate",
+    "useSuggested": "Usa {{language}} come lingua di origine",
+    "noTargetSelected": "Seleziona almeno una lingua di destinazione per la traduzione",
+    "translationFlow": "Flusso di traduzione",
+    "infoBox": "Il nostro sistema rileva automaticamente la lingua dei tuoi file. Puoi selezionare fino a 5 lingue di destinazione per la traduzione simultanea."
+  },
+  "settings": {
+    "engineSelection": "Selezione motore IA",
+    "qualityLevel": "Livello di qualità",
+    "sectorPresets": "Preimpostazioni settoriali",
+    "advancedOptions": "Opzioni avanzate",
+    "accuracy": "Precisione",
+    "speed": "Velocità",
+    "infoBox": "Le impostazioni sono ottimizzate automaticamente in base ai tuoi file e al settore di attività.",
+    "engines": {
+      "auto": {
+        "name": "Selezione automatica",
+        "description": "Il sistema sceglie il miglior motore per i tuoi file"
+      },
+      "whisper": {
+        "description": "Eccellente per multilingua e alta precisione"
+      },
+      "deepgram": {
+        "description": "Ideale per trascrizione in tempo reale"
+      },
+      "elevenlabs": {
+        "description": "Ottimizzato per sintesi vocale naturale"
+      }
+    },
+    "quality": {
+      "fast": {
+        "name": "Veloce",
+        "description": "Elaborazione accelerata"
+      },
+      "balanced": {
+        "name": "Bilanciato",
+        "description": "Miglior compromesso"
+      },
+      "high": {
+        "name": "Alta precisione",
+        "description": "Qualità massima"
+      }
+    },
+    "sectors": {
+      "general": "Generale",
+      "medical": "Medico",
+      "legal": "Legale",
+      "business": "Business",
+      "education": "Educazione",
+      "technical": "Tecnico"
+    },
+    "options": {
+      "speakerDiarization": "Diarizzazione parlanti",
+      "speakerDiarizationDesc": "Identifica e separa diversi parlanti",
+      "punctuation": "Punteggiatura automatica",
+      "punctuationDesc": "Aggiungi punteggiatura automaticamente",
+      "timestamps": "Timestamp",
+      "timestampsDesc": "Includi marcatori temporali",
+      "summarization": "Riassunto automatico",
+      "summarizationDesc": "Genera riassunto del contenuto",
+      "confidenceThreshold": "Soglia di confidenza",
+      "confidenceThresholdDesc": "Livello minimo di certezza per la trascrizione"
+    },
+    "features": {
+      "smart-selection": "Selezione intelligente",
+      "best-accuracy": "Migliore precisione",
+      "multilingual": "Multilingua",
+      "high-accuracy": "Alta precisione",
+      "real-time": "Tempo reale",
+      "fast": "Veloce",
+      "voice-synthesis": "Sintesi vocale",
+      "natural": "Naturale"
+    }
+  },
+  "summary": {
+    "projectName": "Nome progetto",
+    "projectNamePlaceholder": "Es: Conferenza Q4 2024",
+    "files": "File",
+    "languages": "Lingue",
+    "settings": "Impostazioni",
+    "estimation": "Stima",
+    "sourceLanguage": "Lingua di origine",
+    "targetLanguages": "Lingue di destinazione",
+    "engine": "Motore IA",
+    "quality": "Qualità",
+    "sector": "Settore",
+    "estimatedTime": "Tempo stimato",
+    "minutesUsed": "Minuti utilizzati",
+    "additionalCost": "Costo aggiuntivo",
+    "included": "Incluso",
+    "plan": "Piano {{plan}}",
+    "quotaExceeded": "Quota superata",
+    "quotaExceededDesc": "Superi la tua quota di {{overage}} minuti. Costo aggiuntivo: {{cost}}€",
+    "upgradePlan": "Aggiorna il tuo piano",
+    "aiFeatures": "Funzioni IA attivate",
+    "totalFiles": "File totali",
+    "totalSize": "Dimensione totale",
+    "info": "I tuoi file saranno elaborati secondo le impostazioni scelte",
+    "startButton": "Avvia trascrizione"
+  }
+}

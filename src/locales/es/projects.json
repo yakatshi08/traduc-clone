@@ -1,0 +1,90 @@
+{
+  "title": "Proyectos",
+  "subtitle": "{{count}} proyectos encontrados",
+  "newProject": "Nuevo proyecto",
+  "import": "Importar",
+  "export": "Exportar",
+  "searchPlaceholder": "Buscar proyectos...",
+  "filters": "Filtros",
+  "selectedCount": "{{count}} proyecto(s) seleccionado(s)",
+  "noOwner": "Sin asignar",
+  "progress": "Progreso",
+  "accuracy": "Precisión",
+  "duration": "Duración",
+  "table": {
+    "name": "Nombre",
+    "type": "Tipo",
+    "status": "Estado",
+    "date": "Fecha",
+    "accuracy": "Precisión",
+    "actions": "Acciones"
+  },
+  "type": {
+    "document": "Documento",
+    "video": "Vídeo",
+    "audio": "Audio"
+  },
+  "status": {
+    "completed": "Completado",
+    "processing": "Procesando",
+    "ready": "Listo",
+    "error": "Error"
+  },
+  "actions": {
+    "view": "Ver",
+    "edit": "Editar",
+    "download": "Descargar",
+    "share": "Compartir",
+    "delete": "Eliminar"
+  },
+  "bulkActions": {
+    "delete": "Eliminar",
+    "export": "Exportar",
+    "archive": "Archivar"
+  },
+  "pagination": {
+    "showing": "Mostrando {{start}} a {{end}} de {{total}} resultados"
+  },
+  "filters": {
+    "title": "Filtros avanzados",
+    "reset": "Restablecer",
+    "active": "Filtros activos",
+    "statusLabel": "Estado",
+    "typeLabel": "Tipo",
+    "languageLabel": "Idioma",
+    "dateLabel": "Período",
+    "sectorLabel": "Sector",
+    "status": {
+      "all": "Todos los estados",
+      "completed": "Completado",
+      "processing": "Procesando",
+      "ready": "Listo",
+      "error": "Error"
+    },
+    "type": {
+      "all": "Todos los tipos",
+      "document": "Documento",
+      "video": "Vídeo",
+      "audio": "Audio"
+    },
+    "language": {
+      "all": "Todos los idiomas"
+    },
+    "dateRange": {
+      "all": "Todas las fechas",
+      "today": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes",
+      "quarter": "Este trimestre",
+      "year": "Este año"
+    },
+    "sector": {
+      "all": "Todos los sectores",
+      "business": "Negocios",
+      "medical": "Médico",
+      "legal": "Legal",
+      "education": "Educación",
+      "technical": "Técnico"
+    }
+  }
+}

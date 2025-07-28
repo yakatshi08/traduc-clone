@@ -1,0 +1,90 @@
+{
+  "title": "Projekte",
+  "subtitle": "{{count}} Projekte gefunden",
+  "newProject": "Neues Projekt",
+  "import": "Importieren",
+  "export": "Exportieren",
+  "searchPlaceholder": "Projekte suchen...",
+  "filters": "Filter",
+  "selectedCount": "{{count}} Projekt(e) ausgewählt",
+  "noOwner": "Nicht zugewiesen",
+  "progress": "Fortschritt",
+  "accuracy": "Genauigkeit",
+  "duration": "Dauer",
+  "table": {
+    "name": "Name",
+    "type": "Typ",
+    "status": "Status",
+    "date": "Datum",
+    "accuracy": "Genauigkeit",
+    "actions": "Aktionen"
+  },
+  "type": {
+    "document": "Dokument",
+    "video": "Video",
+    "audio": "Audio"
+  },
+  "status": {
+    "completed": "Abgeschlossen",
+    "processing": "In Bearbeitung",
+    "ready": "Bereit",
+    "error": "Fehler"
+  },
+  "actions": {
+    "view": "Ansehen",
+    "edit": "Bearbeiten",
+    "download": "Herunterladen",
+    "share": "Teilen",
+    "delete": "Löschen"
+  },
+  "bulkActions": {
+    "delete": "Löschen",
+    "export": "Exportieren",
+    "archive": "Archivieren"
+  },
+  "pagination": {
+    "showing": "Zeige {{start}} bis {{end}} von {{total}} Ergebnissen"
+  },
+  "filters": {
+    "title": "Erweiterte Filter",
+    "reset": "Zurücksetzen",
+    "active": "Aktive Filter",
+    "statusLabel": "Status",
+    "typeLabel": "Typ",
+    "languageLabel": "Sprache",
+    "dateLabel": "Zeitraum",
+    "sectorLabel": "Sektor",
+    "status": {
+      "all": "Alle Status",
+      "completed": "Abgeschlossen",
+      "processing": "In Bearbeitung",
+      "ready": "Bereit",
+      "error": "Fehler"
+    },
+    "type": {
+      "all": "Alle Typen",
+      "document": "Dokument",
+      "video": "Video",
+      "audio": "Audio"
+    },
+    "language": {
+      "all": "Alle Sprachen"
+    },
+    "dateRange": {
+      "all": "Alle Daten",
+      "today": "Heute",
+      "week": "Diese Woche",
+      "month": "Dieser Monat",
+      "quarter": "Dieses Quartal",
+      "year": "Dieses Jahr"
+    },
+    "sector": {
+      "all": "Alle Sektoren",
+      "business": "Geschäft",
+      "medical": "Medizinisch",
+      "legal": "Rechtlich",
+      "education": "Bildung",
+      "technical": "Technisch"
+    }
+  }
+}

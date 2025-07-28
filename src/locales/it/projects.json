@@ -1,0 +1,90 @@
+{
+  "title": "Progetti",
+  "subtitle": "{{count}} progetti trovati",
+  "newProject": "Nuovo progetto",
+  "import": "Importa",
+  "export": "Esporta",
+  "searchPlaceholder": "Cerca progetti...",
+  "filters": "Filtri",
+  "selectedCount": "{{count}} progetto/i selezionato/i",
+  "noOwner": "Non assegnato",
+  "progress": "Progresso",
+  "accuracy": "Precisione",
+  "duration": "Durata",
+  "table": {
+    "name": "Nome",
+    "type": "Tipo",
+    "status": "Stato",
+    "date": "Data",
+    "accuracy": "Precisione",
+    "actions": "Azioni"
+  },
+  "type": {
+    "document": "Documento",
+    "video": "Video",
+    "audio": "Audio"
+  },
+  "status": {
+    "completed": "Completato",
+    "processing": "In elaborazione",
+    "ready": "Pronto",
+    "error": "Errore"
+  },
+  "actions": {
+    "view": "Visualizza",
+    "edit": "Modifica",
+    "download": "Scarica",
+    "share": "Condividi",
+    "delete": "Elimina"
+  },
+  "bulkActions": {
+    "delete": "Elimina",
+    "export": "Esporta",
+    "archive": "Archivia"
+  },
+  "pagination": {
+    "showing": "Visualizzazione da {{start}} a {{end}} di {{total}} risultati"
+  },
+  "filters": {
+    "title": "Filtri avanzati",
+    "reset": "Reimposta",
+    "active": "Filtri attivi",
+    "statusLabel": "Stato",
+    "typeLabel": "Tipo",
+    "languageLabel": "Lingua",
+    "dateLabel": "Periodo",
+    "sectorLabel": "Settore",
+    "status": {
+      "all": "Tutti gli stati",
+      "completed": "Completato",
+      "processing": "In elaborazione",
+      "ready": "Pronto",
+      "error": "Errore"
+    },
+    "type": {
+      "all": "Tutti i tipi",
+      "document": "Documento",
+      "video": "Video",
+      "audio": "Audio"
+    },
+    "language": {
+      "all": "Tutte le lingue"
+    },
+    "dateRange": {
+      "all": "Tutte le date",
+      "today": "Oggi",
+      "week": "Questa settimana",
+      "month": "Questo mese",
+      "quarter": "Questo trimestre",
+      "year": "Quest'anno"
+    },
+    "sector": {
+      "all": "Tutti i settori",
+      "business": "Business",
+      "medical": "Medico",
+      "legal": "Legale",
+      "education": "Educazione",
+      "technical": "Tecnico"
+    }
+  }
+}
