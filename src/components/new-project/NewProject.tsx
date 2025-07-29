@@ -26,6 +26,7 @@ import LanguageSelector from './LanguageSelector';
 import TranscriptionSettings from './TranscriptionSettings';
 import ProjectSummary from './ProjectSummary';
 
+// Interface pour les fichiers uploadés
 interface UploadedFile {
   id: string;
   file: File;
@@ -56,13 +57,15 @@ const NewProject: React.FC = () => {
     confidenceThreshold: 0.8
   });
 
+  // Définition des étapes
   const steps = [
-    { id: 1, label: t('newProject:steps.upload'), icon: Upload },
-    { id: 2, label: t('newProject:steps.languages'), icon: Languages },
-    { id: 3, label: t('newProject:steps.settings'), icon: Settings },
-    { id: 4, label: t('newProject:steps.review'), icon: Check }
+    { id: 1, label: 'Téléchargement', icon: Upload },
+    { id: 2, label: 'Langues', icon: Languages },
+    { id: 3, label: 'Paramètres', icon: Settings },
+    { id: 4, label: 'Récapitulatif', icon: Check }
   ];
 
+  // Fonctions handlers
   const handleFilesSelected = (files: File[]) => {
     const newFiles: UploadedFile[] = files.map((file) => ({
       id: Math.random().toString(36).substr(2, 9),
@@ -141,7 +144,6 @@ const NewProject: React.FC = () => {
   };
 
   const handleStartTranscription = () => {
-    // Logique pour démarrer la transcription
     console.log('Starting transcription with:', {
       projectName,
       files: uploadedFiles,
@@ -149,11 +151,12 @@ const NewProject: React.FC = () => {
       targetLanguages,
       settings: transcriptionSettings
     });
+    // TODO: Implémenter la logique de démarrage
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+      {/* Header simplifié */}
       <div className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700/50 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -166,10 +169,10 @@ const NewProject: React.FC = () => {
               </button>
               <div>
                 <h1 className="text-xl font-bold text-white">
-                  {t('newProject:title')}
+                  Nouveau Projet
                 </h1>
                 <p className="text-sm text-gray-400">
-                  {t('newProject:subtitle')}
+                  Configurez votre projet de transcription et traduction
                 </p>
               </div>
             </div>
@@ -209,178 +212,172 @@ const NewProject: React.FC = () => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Mobile Steps */}
-        <div className="lg:hidden mb-8">
-          <div className="flex items-center justify-between">
-            {steps.map((s) => (
-              <div
-                key={s.id}
-                className={`
-                  flex-1 h-2 rounded-full mx-1 transition-all
-                  ${step >= s.id 
-                    ? 'bg-gradient-to-r from-violet-600 to-indigo-600' 
-                    : 'bg-slate-800'
-                  }
-                `}
-              />
-            ))}
+      {/* Contenu principal centré */}
+      <div className="flex-1 flex items-center justify-center px-6 py-8">
+        <div className="w-full max-w-6xl">
+          {/* Mobile Steps */}
+          <div className="lg:hidden mb-8">
+            <div className="flex items-center justify-between">
+              {steps.map((s) => (
+                <div
+                  key={s.id}
+                  className={`
+                    flex-1 h-2 rounded-full mx-1 transition-all
+                    ${step >= s.id 
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600' 
+                      : 'bg-slate-800'
+                    }
+                  `}
+                />
+              ))}
+            </div>
+            <p className="text-center text-sm text-gray-400 mt-3">
+              Étape {step} / {steps.length}: {steps[step - 1].label}
+            </p>
           </div>
-          <p className="text-center text-sm text-gray-400 mt-3">
-            {t('newProject:step')} {step} / {steps.length}: {steps[step - 1].label}
-          </p>
-        </div>
 
-        {/* Step Content */}
-        <div className="animate-fadeIn">
-          {step === 1 && (
-            <div className="space-y-6">
-              <FileUploadZone
-                onFilesSelected={handleFilesSelected}
-                uploadedFiles={uploadedFiles}
-                onRemoveFile={handleRemoveFile}
-              />
-              
-              {/* File Type Info */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-violet-500/20 rounded-lg">
-                      <FileText className="w-5 h-5 text-violet-400" />
+          {/* Step Content */}
+          <div className="animate-fadeIn">
+            {step === 1 && (
+              <div className="space-y-6">
+                <FileUploadZone
+                  onFilesSelected={handleFilesSelected}
+                  uploadedFiles={uploadedFiles}
+                  onRemoveFile={handleRemoveFile}
+                />
+                
+                {/* File Type Info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-violet-500/20 rounded-lg">
+                        <FileText className="w-5 h-5 text-violet-400" />
+                      </div>
+                      <h3 className="font-medium text-white">Documents</h3>
                     </div>
-                    <h3 className="font-medium text-white">
-                      {t('newProject:fileTypes.documents.title')}
-                    </h3>
+                    <p className="text-sm text-gray-400">
+                      PDF, DOCX, TXT, ODT
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-400">
-                    {t('newProject:fileTypes.documents.formats')}
-                  </p>
-                </div>
 
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-blue-500/20 rounded-lg">
-                      <Video className="w-5 h-5 text-blue-400" />
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                        <Video className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <h3 className="font-medium text-white">Vidéos</h3>
                     </div>
-                    <h3 className="font-medium text-white">
-                      {t('newProject:fileTypes.videos.title')}
-                    </h3>
+                    <p className="text-sm text-gray-400">
+                      MP4, AVI, MOV, MKV
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-400">
-                    {t('newProject:fileTypes.videos.formats')}
-                  </p>
-                </div>
 
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 bg-purple-500/20 rounded-lg">
-                      <Headphones className="w-5 h-5 text-purple-400" />
+                  <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-2 bg-purple-500/20 rounded-lg">
+                        <Headphones className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <h3 className="font-medium text-white">Audio</h3>
                     </div>
-                    <h3 className="font-medium text-white">
-                      {t('newProject:fileTypes.audio.title')}
-                    </h3>
+                    <p className="text-sm text-gray-400">
+                      MP3, WAV, M4A, FLAC
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-400">
-                    {t('newProject:fileTypes.audio.formats')}
-                  </p>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {step === 2 && (
-            <LanguageSelector
-              sourceLanguage={sourceLanguage}
-              targetLanguages={targetLanguages}
-              onSourceLanguageChange={setSourceLanguage}
-              onTargetLanguagesChange={setTargetLanguages}
-              detectedLanguages={uploadedFiles.map(f => ({ 
-                fileName: f.name, 
-                language: f.language || 'unknown' 
-              }))}
-            />
-          )}
+            {step === 2 && (
+              <LanguageSelector
+                sourceLanguage={sourceLanguage}
+                targetLanguages={targetLanguages}
+                onSourceLanguageChange={setSourceLanguage}
+                onTargetLanguagesChange={setTargetLanguages}
+                detectedLanguages={uploadedFiles.map(f => ({ 
+                  fileName: f.name, 
+                  language: f.language || 'unknown' 
+                }))}
+              />
+            )}
 
-          {step === 3 && (
-            <TranscriptionSettings
-              settings={transcriptionSettings}
-              onSettingsChange={setTranscriptionSettings}
-              fileTypes={[...new Set(uploadedFiles.map(f => f.type))]}
-            />
-          )}
+            {step === 3 && (
+              <TranscriptionSettings
+                settings={transcriptionSettings}
+                onSettingsChange={setTranscriptionSettings}
+                fileTypes={[...new Set(uploadedFiles.map(f => f.type))]}
+              />
+            )}
 
-          {step === 4 && (
-            <ProjectSummary
-              projectName={projectName}
-              onProjectNameChange={setProjectName}
-              files={uploadedFiles}
-              sourceLanguage={sourceLanguage}
-              targetLanguages={targetLanguages}
-              settings={transcriptionSettings}
-              onStartTranscription={handleStartTranscription}
-            />
-          )}
-        </div>
+            {step === 4 && (
+              <ProjectSummary
+                projectName={projectName}
+                onProjectNameChange={setProjectName}
+                files={uploadedFiles}
+                sourceLanguage={sourceLanguage}
+                targetLanguages={targetLanguages}
+                settings={transcriptionSettings}
+                onStartTranscription={handleStartTranscription}
+              />
+            )}
+          </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8">
-          <button
-            onClick={handlePreviousStep}
-            disabled={step === 1}
-            className={`
-              flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all
-              ${step === 1 
-                ? 'bg-slate-800 text-gray-500 cursor-not-allowed' 
-                : 'bg-slate-800 text-white hover:bg-slate-700'
-              }
-            `}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t('newProject:navigation.previous')}
-          </button>
-
-          <div className="flex items-center gap-4">
-            {/* Cancel button */}
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mt-8">
             <button
-              onClick={() => window.history.back()}
-              className="px-6 py-3 text-gray-400 hover:text-white transition-colors"
+              onClick={handlePreviousStep}
+              disabled={step === 1}
+              className={`
+                flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all
+                ${step === 1 
+                  ? 'bg-slate-800 text-gray-500 cursor-not-allowed' 
+                  : 'bg-slate-800 text-white hover:bg-slate-700'
+                }
+              `}
             >
-              {t('newProject:navigation.cancel')}
+              <ArrowLeft className="w-4 h-4" />
+              Précédent
             </button>
 
-            {/* Next/Start button */}
-            {step < 4 ? (
+            <div className="flex items-center gap-4">
               <button
-                onClick={handleNextStep}
-                disabled={!canProceedToNextStep()}
-                className={`
-                  flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all
-                  ${canProceedToNextStep()
-                    ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:shadow-lg' 
-                    : 'bg-slate-800 text-gray-500 cursor-not-allowed'
-                  }
-                `}
+                onClick={() => window.history.back()}
+                className="px-6 py-3 text-gray-400 hover:text-white transition-colors"
               >
-                {t('newProject:navigation.next')}
-                <ChevronRight className="w-4 h-4" />
+                Annuler
               </button>
-            ) : (
-              <button
-                onClick={handleStartTranscription}
-                disabled={!canProceedToNextStep()}
-                className={`
-                  flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all
-                  ${canProceedToNextStep()
-                    ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:shadow-lg' 
-                    : 'bg-slate-800 text-gray-500 cursor-not-allowed'
-                  }
-                `}
-              >
-                <Zap className="w-4 h-4" />
-                {t('newProject:navigation.start')}
-              </button>
-            )}
+
+              {step < 4 ? (
+                <button
+                  onClick={handleNextStep}
+                  disabled={!canProceedToNextStep()}
+                  className={`
+                    flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all
+                    ${canProceedToNextStep()
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:shadow-lg' 
+                      : 'bg-slate-800 text-gray-500 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  Suivant
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleStartTranscription}
+                  disabled={!canProceedToNextStep()}
+                  className={`
+                    flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all
+                    ${canProceedToNextStep()
+                      ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:shadow-lg' 
+                      : 'bg-slate-800 text-gray-500 cursor-not-allowed'
+                    }
+                  `}
+                >
+                  <Zap className="w-4 h-4" />
+                  Démarrer
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

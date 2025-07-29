@@ -32,7 +32,7 @@
   },
   "actions": {
     "view": "Voir",
-    "edit": "Éditer",
+    "edit": "Modifier",
     "download": "Télécharger",
     "share": "Partager",
     "delete": "Supprimer"
@@ -80,7 +80,7 @@
     },
     "sector": {
       "all": "Tous les secteurs",
-      "business": "Business",
+      "business": "Affaires",
       "medical": "Médical",
       "legal": "Juridique",
       "education": "Éducation",

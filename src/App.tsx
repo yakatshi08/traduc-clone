@@ -1,69 +1,83 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import Header from './components/Layout/Header';
-import Sidebar from './components/Layout/Sidebar';
-import Dashboard from './components/Dashboard/Dashboard';
-import './i18n/config';
+import React, { useState } from "react";
+import Sidebar from "./components/Layout/Sidebar";
+import Header from "./components/Layout/Header";
+import Dashboard from "./components/Dashboard/Dashboard";
+import ProjectsPage from "./components/ProjectsPage";
+import NewProject from "./components/new-project/NewProject";
+import AnalyticsPage from "./components/AnalyticsPage";
+import "./i18n/config";
 
 function App() {
-  const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState("dashboard");
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'projects':
-        return (
-          <div className="animate-fadeIn">
-            <h1 className="text-3xl font-bold text-white mb-4">{t('pages.projects.title', 'Projets')}</h1>
-            <p className="text-gray-400">{t('pages.projects.description', 'Gérez vos projets de transcription et traduction')}</p>
-          </div>
-        );
-      case 'analytics':
-        return (
-          <div className="animate-fadeIn">
-            <h1 className="text-3xl font-bold text-white mb-4">{t('pages.analytics.title', 'Analytiques')}</h1>
-            <p className="text-gray-400">{t('pages.analytics.description', 'Visualisez vos statistiques détaillées')}</p>
-          </div>
-        );
-      case 'settings':
-        return (
-          <div className="animate-fadeIn">
-            <h1 className="text-3xl font-bold text-white mb-4">{t('pages.settings.title', 'Paramètres')}</h1>
-            <p className="text-gray-400">{t('pages.settings.description', 'Configurez votre espace de travail')}</p>
-          </div>
-        );
-      default:
-        return <Dashboard />;
-    }
+  const handleTabChange = (tab: string) => {
+    console.log("Changing tab to:", tab);
+    setActiveTab(tab);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <Header 
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        onToggle={setSidebarOpen} 
         activeTab={activeTab} 
-        onTabChange={setActiveTab}
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
+        onTabChange={handleTabChange} 
       />
       
-      {/* Main Layout */}
-      <div className="flex h-screen pt-16">
-        {/* Sidebar */}
-        <Sidebar 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab}
-          isOpen={sidebarOpen}
-        />
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+        <Header />
         
-        {/* Main Content */}
-        <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} overflow-y-auto`}>
-          <div className="p-4 lg:p-8 max-w-7xl mx-auto">
-            {renderContent()}
-          </div>
+        {/* Espace pour le header fixe */}
+        <div className="h-16"></div>
+        
+        <main className="p-6 overflow-x-hidden">
+          {activeTab === 'dashboard' && <Dashboard />}
+          {activeTab === 'projects' && <ProjectsPage onNavigate={handleTabChange} />}
+          {activeTab === 'new-project' && <NewProject onNavigate={handleTabChange} />}
+          {activeTab === 'analytics' && <AnalyticsPage />}
+          {activeTab === 'settings' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Paramètres</h1>
+              <p className="text-gray-400">Configuration de l'application</p>
+            </div>
+          )}
+          {activeTab === 'documents' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Documents</h1>
+              <p className="text-gray-400">Gestion des documents</p>
+            </div>
+          )}
+          {activeTab === 'videos' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Vidéos</h1>
+              <p className="text-gray-400">Gestion des vidéos</p>
+            </div>
+          )}
+          {activeTab === 'audios' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Audios</h1>
+              <p className="text-gray-400">Gestion des fichiers audio</p>
+            </div>
+          )}
+          {activeTab === 'cloud-storage' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Cloud Storage</h1>
+              <p className="text-gray-400">Intégration cloud</p>
+            </div>
+          )}
+          {activeTab === 'collaboration' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Collaboration</h1>
+              <p className="text-gray-400">Outils collaboratifs</p>
+            </div>
+          )}
+          {activeTab === 'ai-tools' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Outils IA</h1>
+              <p className="text-gray-400">Intelligence artificielle</p>
+            </div>
+          )}
         </main>
       </div>
     </div>
