@@ -5,14 +5,20 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import ProjectsPage from "./components/ProjectsPage";
 import NewProject from "./components/new-project/NewProject";
 import AnalyticsPage from "./components/AnalyticsPage";
+import ProjectDetail from "./components/ProjectDetail";
+import DocumentsPage from "./components/DocumentsPage"; // Import présent
 import "./i18n/config";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
-  const handleTabChange = (tab: string) => {
-    console.log("Changing tab to:", tab);
+  const handleTabChange = (tab: string, projectId?: number) => {
+    console.log("Changing tab to:", tab, projectId);
+    if (tab === 'project-detail' && projectId) {
+      setSelectedProjectId(projectId);
+    }
     setActiveTab(tab);
   };
 
@@ -27,27 +33,22 @@ function App() {
       
       <div className={`transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
         <Header />
-        
-        {/* Espace pour le header fixe */}
         <div className="h-16"></div>
-        
         <main className="p-6 overflow-x-hidden">
           {activeTab === 'dashboard' && <Dashboard />}
           {activeTab === 'projects' && <ProjectsPage onNavigate={handleTabChange} />}
           {activeTab === 'new-project' && <NewProject onNavigate={handleTabChange} />}
           {activeTab === 'analytics' && <AnalyticsPage />}
-          {activeTab === 'settings' && (
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h1 className="text-2xl font-bold text-white mb-4">Paramètres</h1>
-              <p className="text-gray-400">Configuration de l'application</p>
-            </div>
+          {activeTab === 'project-detail' && selectedProjectId && (
+            <ProjectDetail 
+              projectId={selectedProjectId} 
+              onNavigate={handleTabChange} 
+            />
           )}
-          {activeTab === 'documents' && (
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h1 className="text-2xl font-bold text-white mb-4">Documents</h1>
-              <p className="text-gray-400">Gestion des documents</p>
-            </div>
-          )}
+          
+          {/* Point clé : placeholder remplacé par le composant DocumentsPage */}
+          {activeTab === 'documents' && <DocumentsPage />}
+          
           {activeTab === 'videos' && (
             <div className="bg-gray-800 rounded-lg p-6">
               <h1 className="text-2xl font-bold text-white mb-4">Vidéos</h1>
@@ -76,6 +77,12 @@ function App() {
             <div className="bg-gray-800 rounded-lg p-6">
               <h1 className="text-2xl font-bold text-white mb-4">Outils IA</h1>
               <p className="text-gray-400">Intelligence artificielle</p>
+            </div>
+          )}
+          {activeTab === 'settings' && (
+            <div className="bg-gray-800 rounded-lg p-6">
+              <h1 className="text-2xl font-bold text-white mb-4">Paramètres</h1>
+              <p className="text-gray-400">Configuration</p>
             </div>
           )}
         </main>
