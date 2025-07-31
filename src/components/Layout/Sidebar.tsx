@@ -84,6 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen }) => 
       icon: Zap,
       color: 'text-yellow-400'
     }
+    // SUPPRIMÉ le bouton settings d'ici car il est déjà en bas
   ];
 
   return (
@@ -102,9 +103,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen }) => 
         bg-slate-800/95 backdrop-blur-sm border-r border-slate-700/50
         transition-all duration-300 ease-in-out
         ${isOpen ? 'w-64' : 'w-0 lg:w-20'}
-        overflow-hidden
+        overflow-y-auto overflow-x-hidden
       `}>
-        <div className={`p-4 ${!isOpen && 'lg:p-2'}`}>
+        <div className={`p-4 pb-20 ${!isOpen && 'lg:p-2 lg:pb-20'} h-full flex flex-col`}>
           {/* Main Navigation */}
           <nav className="space-y-2">
             {menuItems.map((item) => {
@@ -138,73 +139,88 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen }) => 
             })}
           </nav>
 
-          {/* Categories */}
-          {isOpen && (
-            <>
-              <div className="mt-8 mb-3">
+          {/* Categories - VISIBLE MÊME QUAND COLLAPSED */}
+          <div className="mt-8">
+            {isOpen && (
+              <div className="mb-3">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
                   {t('categories', 'Catégories')}
                 </h3>
               </div>
-              <nav className="space-y-1">
-                {categoryItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => onTabChange(item.id)}
-                      className={`
-                        w-full flex items-center gap-3 px-3 py-2 rounded-lg
-                        transition-all duration-200
-                        ${isActive 
-                          ? 'bg-violet-600/20 text-violet-400' 
-                          : 'text-gray-400 hover:bg-slate-700 hover:text-white'
-                        }
-                      `}
-                    >
-                      <Icon className={`w-4 h-4 ${item.color}`} />
+            )}
+            <nav className="space-y-1">
+              {categoryItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`
+                      w-full flex items-center gap-3 px-3 py-2 rounded-lg
+                      transition-all duration-200
+                      ${isActive 
+                        ? 'bg-violet-600/20 text-violet-400' 
+                        : 'text-gray-400 hover:bg-slate-700 hover:text-white'
+                      }
+                      ${!isOpen && 'lg:justify-center lg:px-2'}
+                    `}
+                    title={!isOpen ? item.label : ''}
+                  >
+                    <Icon className={`w-4 h-4 ${item.color} ${!isOpen && 'lg:w-5 lg:h-5'}`} />
+                    {isOpen && (
                       <span className="text-sm">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
 
-              {/* Tools */}
-              <div className="mt-8 mb-3">
+          {/* Tools - VISIBLE MÊME QUAND COLLAPSED */}
+          <div className="mt-8">
+            {isOpen && (
+              <div className="mb-3">
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3">
                   {t('tools', 'Outils')}
                 </h3>
               </div>
-              <nav className="space-y-1">
-                {toolItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => onTabChange(item.id)}
-                      className={`
-                        w-full flex items-center gap-3 px-3 py-2 rounded-lg
-                        transition-all duration-200
-                        ${isActive 
-                          ? 'bg-slate-600 text-white' 
-                          : 'text-gray-400 hover:bg-slate-700 hover:text-white'
-                        }
-                      `}
-                    >
-                      <Icon className={`w-4 h-4 ${item.color}`} />
+            )}
+            <nav className="space-y-1">
+              {toolItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`
+                      w-full flex items-center gap-3 px-3 py-2 rounded-lg
+                      transition-all duration-200
+                      ${isActive 
+                        ? 'bg-slate-600 text-white' 
+                        : 'text-gray-400 hover:bg-slate-700 hover:text-white'
+                      }
+                      ${!isOpen && 'lg:justify-center lg:px-2'}
+                    `}
+                    title={!isOpen ? item.label : ''}
+                  >
+                    <Icon className={`w-4 h-4 ${item.color} ${!isOpen && 'lg:w-5 lg:h-5'}`} />
+                    {isOpen && (
                       <span className="text-sm">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </nav>
-            </>
-          )}
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
 
-          {/* Settings */}
+          {/* Spacer pour pousser Settings en bas */}
+          <div className="flex-grow"></div>
+
+          {/* Settings - TOUJOURS VISIBLE */}
           <div className={`${isOpen ? 'mt-8 pt-8 border-t border-slate-700' : 'mt-8'}`}>
             <button
               onClick={() => onTabChange('settings')}
@@ -212,7 +228,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen }) => 
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
                 transition-all duration-200
                 ${activeTab === 'settings'
-                  ? 'bg-slate-600 text-white' 
+                  ? 'bg-gradient-to-r from-gray-600 to-gray-700 text-white shadow-lg' 
                   : 'text-gray-400 hover:bg-slate-700 hover:text-white'
                 }
                 ${!isOpen && 'lg:justify-center lg:px-2'}
@@ -222,6 +238,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, isOpen }) => 
               <Settings className={`w-5 h-5 ${!isOpen && 'lg:w-6 lg:h-6'}`} />
               {isOpen && (
                 <span className="font-medium">{t('navigation.settings', 'Paramètres')}</span>
+              )}
+              {activeTab === 'settings' && !isOpen && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
               )}
             </button>
           </div>

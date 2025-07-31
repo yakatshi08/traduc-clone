@@ -6,7 +6,10 @@ import ProjectsPage from "./components/ProjectsPage";
 import NewProject from "./components/new-project/NewProject";
 import AnalyticsPage from "./components/AnalyticsPage";
 import ProjectDetail from "./components/ProjectDetail";
-import DocumentsPage from "./components/DocumentsPage"; // Import présent
+import DocumentsPage from "./components/DocumentsPage";
+import VideosPage from "./components/VideosPage";
+import AudiosPage from "./components/AudiosPage";
+import SettingsPage from "./components/SettingsPage";
 import "./i18n/config";
 
 function App() {
@@ -46,21 +49,10 @@ function App() {
             />
           )}
           
-          {/* Point clé : placeholder remplacé par le composant DocumentsPage */}
           {activeTab === 'documents' && <DocumentsPage />}
+          {activeTab === 'videos' && <VideosPage />}
+          {activeTab === 'audios' && <AudiosPage />}
           
-          {activeTab === 'videos' && (
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h1 className="text-2xl font-bold text-white mb-4">Vidéos</h1>
-              <p className="text-gray-400">Gestion des vidéos</p>
-            </div>
-          )}
-          {activeTab === 'audios' && (
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h1 className="text-2xl font-bold text-white mb-4">Audios</h1>
-              <p className="text-gray-400">Gestion des fichiers audio</p>
-            </div>
-          )}
           {activeTab === 'cloud-storage' && (
             <div className="bg-gray-800 rounded-lg p-6">
               <h1 className="text-2xl font-bold text-white mb-4">Cloud Storage</h1>
@@ -79,12 +71,7 @@ function App() {
               <p className="text-gray-400">Intelligence artificielle</p>
             </div>
           )}
-          {activeTab === 'settings' && (
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h1 className="text-2xl font-bold text-white mb-4">Paramètres</h1>
-              <p className="text-gray-400">Configuration</p>
-            </div>
-          )}
+          {activeTab === 'settings' && <SettingsPage />}
         </main>
       </div>
     </div>

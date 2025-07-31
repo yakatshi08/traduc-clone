@@ -79,7 +79,11 @@ const Header: React.FC<HeaderProps> = ({
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
           </button>
           
-          <button className="p-2 hover:bg-slate-800 rounded-lg transition-colors">
+          {/* Bouton Settings modifié */}
+          <button 
+            onClick={() => onTabChange && onTabChange('settings')}
+            className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+          >
             <Settings className="w-5 h-5 text-gray-400" />
           </button>
           
