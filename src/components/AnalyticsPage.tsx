@@ -1,125 +1,135 @@
 import React from 'react';
-import { BarChart3, TrendingUp, Users, Globe, Activity, PieChart } from 'lucide-react';
+import { 
+  TrendingUp, 
+  Clock, 
+  FileText, 
+  Users,
+  Activity,
+  Download,
+  Calendar,
+  BarChart3
+} from 'lucide-react';
 
-const AnalyticsPage = () => {
+const AnalyticsPage: React.FC = () => {
   return (
-    <div className="w-full">
-      {/* ESPACE GARANTI EN HAUT - 150px */}
-      <div style={{ paddingTop: '20px' }}>
-        
-        {/* TITRE PRINCIPAL */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-3">Analytiques</h1>
-          <p className="text-xl text-gray-400">Analyse détaillée de vos projets de traduction et transcription</p>
+    <div className="p-6"> {/* SUPPRIMÉ ml-64 */}
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Analytiques</h1>
+        <p className="text-gray-400">Suivez vos performances et statistiques</p>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-blue-400" />
+            </div>
+            <span className="text-sm text-emerald-400">+12.5%</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">1,248</h3>
+          <p className="text-sm text-gray-400">Transcriptions totales</p>
         </div>
 
-        {/* CARTES DE STATISTIQUES */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Carte 1 - Projets */}
-          <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <BarChart3 className="w-8 h-8 opacity-80" />
-              <span className="text-sm bg-white bg-opacity-20 px-2 py-1 rounded">+12%</span>
+        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+              <Clock className="w-6 h-6 text-purple-400" />
             </div>
-            <h3 className="text-3xl font-bold mb-1">1,234</h3>
-            <p className="text-purple-200">Projets complétés</p>
+            <span className="text-sm text-emerald-400">+8.2%</span>
           </div>
-
-          {/* Carte 2 - Précision */}
-          <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="w-8 h-8 opacity-80" />
-              <span className="text-sm bg-white bg-opacity-20 px-2 py-1 rounded">+8%</span>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">98.5%</h3>
-            <p className="text-blue-200">Précision moyenne</p>
-          </div>
-
-          {/* Carte 3 - Utilisateurs */}
-          <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <Users className="w-8 h-8 opacity-80" />
-              <span className="text-sm bg-white bg-opacity-20 px-2 py-1 rounded">+25%</span>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">523</h3>
-            <p className="text-green-200">Utilisateurs actifs</p>
-          </div>
-
-          {/* Carte 4 - Langues */}
-          <div className="bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-xl p-6 text-white">
-            <div className="flex items-center justify-between mb-4">
-              <Globe className="w-8 h-8 opacity-80" />
-              <span className="text-sm bg-white bg-opacity-20 px-2 py-1 rounded">5 actives</span>
-            </div>
-            <h3 className="text-3xl font-bold mb-1">12</h3>
-            <p className="text-yellow-200">Langues supportées</p>
-          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">324h</h3>
+          <p className="text-sm text-gray-400">Heures traitées</p>
         </div>
 
-        {/* SECTION GRAPHIQUES */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Graphique 1 */}
-          <div className="bg-gray-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Évolution mensuelle</h3>
-              <Activity className="w-6 h-6 text-gray-400" />
+        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+              <FileText className="w-6 h-6 text-emerald-400" />
             </div>
-            <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center">
-              <p className="text-gray-400">Graphique en cours de développement</p>
-            </div>
+            <span className="text-sm text-emerald-400">+15.3%</span>
           </div>
+          <h3 className="text-2xl font-bold text-white mb-1">892</h3>
+          <p className="text-sm text-gray-400">Documents traduits</p>
+        </div>
 
-          {/* Graphique 2 */}
-          <div className="bg-gray-800 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Répartition par type</h3>
-              <PieChart className="w-6 h-6 text-gray-400" />
+        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-orange-400" />
             </div>
-            <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center">
-              <p className="text-gray-400">Graphique en cours de développement</p>
-            </div>
+            <span className="text-sm text-red-400">-2.1%</span>
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-1">145</h3>
+          <p className="text-sm text-gray-400">Utilisateurs actifs</p>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white">Évolution mensuelle</h3>
+            <button className="text-gray-400 hover:text-white">
+              <Download className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="h-64 flex items-center justify-center text-gray-500">
+            <BarChart3 className="w-16 h-16" />
+            <span className="ml-4">Graphique des transcriptions</span>
           </div>
         </div>
 
-        {/* TABLEAU RÉCENT */}
-        <div className="bg-gray-800 rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Activité récente</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-gray-400 border-b border-gray-700">
-                  <th className="pb-3">Projet</th>
-                  <th className="pb-3">Type</th>
-                  <th className="pb-3">Langue</th>
-                  <th className="pb-3">Précision</th>
-                  <th className="pb-3">Date</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-300">
-                <tr className="border-b border-gray-700">
-                  <td className="py-3">Conférence Q4 2024</td>
-                  <td className="py-3">Vidéo</td>
-                  <td className="py-3">FR → EN</td>
-                  <td className="py-3">98.5%</td>
-                  <td className="py-3">Il y a 2h</td>
-                </tr>
-                <tr className="border-b border-gray-700">
-                  <td className="py-3">Rapport médical</td>
-                  <td className="py-3">Document</td>
-                  <td className="py-3">EN → ES</td>
-                  <td className="py-3">99.2%</td>
-                  <td className="py-3">Il y a 5h</td>
-                </tr>
-                <tr>
-                  <td className="py-3">Podcast Interview</td>
-                  <td className="py-3">Audio</td>
-                  <td className="py-3">ES → FR</td>
-                  <td className="py-3">97.8%</td>
-                  <td className="py-3">Hier</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white">Répartition par type</h3>
+            <button className="text-gray-400 hover:text-white">
+              <Download className="w-5 h-5" />
+            </button>
           </div>
+          <div className="h-64 flex items-center justify-center text-gray-500">
+            <Activity className="w-16 h-16" />
+            <span className="ml-4">Graphique circulaire</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity Table */}
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h3 className="text-lg font-semibold text-white mb-6">Activité récente</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-700">
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Projet</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Durée</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Date</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map((item) => (
+                <tr key={item} className="border-b border-gray-700 hover:bg-gray-750">
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-3">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-white">Projet Example {item}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-gray-400">Transcription</td>
+                  <td className="py-3 px-4 text-gray-400">45 min</td>
+                  <td className="py-3 px-4 text-gray-400">15/12/2024</td>
+                  <td className="py-3 px-4">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400">
+                      Terminé
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

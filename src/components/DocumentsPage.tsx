@@ -1,549 +1,386 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
-  FileText, 
-  Upload, 
   Search, 
   Filter, 
+  Upload,
+  Grid,
+  List,
   Download,
   Eye,
   Trash2,
-  Edit3,
-  MoreVertical,
-  FolderOpen,
-  Grid,
-  List,
-  CheckSquare,
-  Square,
+  Edit,
+  FileText,
   File,
   FileSpreadsheet,
   FileImage,
+  MoreVertical,
   Calendar,
-  SortAsc,
-  SortDesc
+  Clock,
+  ChevronDown,
+  Check,
+  X,
+  FolderOpen
 } from 'lucide-react';
 
-interface Document {
-  id: string;
-  name: string;
-  type: string;
-  size: string;
-  sizeBytes: number;
-  uploadDate: string;
-  modifiedDate: string;
-  status: 'ready' | 'processing' | 'transcribing' | 'error';
-  transcribed: boolean;
-  translated: boolean;
-  languages: string[];
-  owner: string;
-  shared: boolean;
-  tags: string[];
-}
-
 const DocumentsPage: React.FC = () => {
-  console.log("DOCUMENTS PAGE LOADED!"); // AJOUT IMPORTANT
-  const { t } = useTranslation('documents'); // AJOUT
-
+  const { t } = useTranslation('documents');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDocuments, setSelectedDocuments] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState('uploadDate');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDocs, setSelectedDocs] = useState<number[]>([]);
   const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
-  // Données simulées
-  const documents: Document[] = [
+  const documents = [
     {
-      id: '1',
-      name: 'Rapport_Annuel_2024.pdf',
-      type: 'pdf',
-      size: '2.4 MB',
-      sizeBytes: 2400000,
-      uploadDate: '2024-12-15',
-      modifiedDate: '2024-12-16',
-      status: 'ready',
-      transcribed: true,
-      translated: true,
-      languages: ['FR', 'EN', 'ES'],
-      owner: 'Marie Dupont',
-      shared: true,
-      tags: ['finance', 'rapport', '2024']
+      id: 1,
+      name: "Rapport Annuel 2024.pdf",
+      type: "pdf",
+      size: "2.4 MB",
+      date: "15/12/2024",
+      author: "Marie Dupont",
+      status: "completed",
+      tags: ["finance", "annuel"]
     },
     {
-      id: '2',
-      name: 'Contrat_Client_ABC.docx',
-      type: 'docx',
-      size: '156 KB',
-      sizeBytes: 156000,
-      uploadDate: '2024-12-14',
-      modifiedDate: '2024-12-14',
-      status: 'processing',
-      transcribed: false,
-      translated: false,
-      languages: ['FR'],
-      owner: 'Jean Martin',
-      shared: false,
-      tags: ['contrat', 'juridique']
+      id: 2,
+      name: "Présentation Client.pptx",
+      type: "presentation",
+      size: "5.8 MB",
+      date: "14/12/2024",
+      author: "Jean Martin",
+      status: "processing",
+      tags: ["client", "vente"]
     },
     {
-      id: '3',
-      name: 'Présentation_Projet.pptx',
-      type: 'pptx',
-      size: '8.7 MB',
-      sizeBytes: 8700000,
-      uploadDate: '2024-12-13',
-      modifiedDate: '2024-12-15',
-      status: 'ready',
-      transcribed: true,
-      translated: false,
-      languages: ['FR'],
-      owner: 'Marie Dupont',
-      shared: true,
-      tags: ['présentation', 'projet']
+      id: 3,
+      name: "Données Analytiques.xlsx",
+      type: "spreadsheet",
+      size: "1.2 MB",
+      date: "13/12/2024",
+      author: "Sophie Bernard",
+      status: "completed",
+      tags: ["data", "analytics"]
     },
     {
-      id: '4',
-      name: 'Notes_Réunion_Q4.txt',
-      type: 'txt',
-      size: '24 KB',
-      sizeBytes: 24000,
-      uploadDate: '2024-12-12',
-      modifiedDate: '2024-12-12',
-      status: 'ready',
-      transcribed: true,
-      translated: true,
-      languages: ['FR', 'EN'],
-      owner: 'Sophie Bernard',
-      shared: true,
-      tags: ['réunion', 'notes']
+      id: 4,
+      name: "Contrat_Service_2024.docx",
+      type: "document",
+      size: "890 KB",
+      date: "12/12/2024",
+      author: "Pierre Leroy",
+      status: "completed",
+      tags: ["legal", "contrat"]
     },
     {
-      id: '5',
-      name: 'Analyse_Marché_2024.xlsx',
-      type: 'xlsx',
-      size: '1.1 MB',
-      sizeBytes: 1100000,
-      uploadDate: '2024-12-10',
-      modifiedDate: '2024-12-11',
-      status: 'transcribing',
-      transcribed: false,
-      translated: false,
-      languages: ['FR'],
-      owner: 'Pierre Durand',
-      shared: false,
-      tags: ['analyse', 'marché', 'données']
+      id: 5,
+      name: "Mockup_Application.png",
+      type: "image",
+      size: "3.2 MB",
+      date: "11/12/2024",
+      author: "Laura Chen",
+      status: "completed",
+      tags: ["design", "ui"]
+    },
+    {
+      id: 6,
+      name: "Guide_Utilisateur.pdf",
+      type: "pdf",
+      size: "4.5 MB",
+      date: "10/12/2024",
+      author: "Thomas Petit",
+      status: "processing",
+      tags: ["documentation", "guide"]
     }
   ];
 
-  // Filtrage et tri
-  const filteredDocuments = documents
-    .filter(doc => {
-      const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          doc.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesType = filterType === 'all' || doc.type === filterType;
-      const matchesStatus = filterStatus === 'all' || doc.status === filterStatus;
-      return matchesSearch && matchesType && matchesStatus;
-    })
-    .sort((a, b) => {
-      let comparison = 0;
-      switch (sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name);
-          break;
-        case 'size':
-          comparison = a.sizeBytes - b.sizeBytes;
-          break;
-        case 'uploadDate':
-          comparison = new Date(a.uploadDate).getTime() - new Date(b.uploadDate).getTime();
-          break;
-        case 'modifiedDate':
-          comparison = new Date(a.modifiedDate).getTime() - new Date(b.modifiedDate).getTime();
-          break;
-      }
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
+  // Fonction getFileIcon mise à jour selon la consigne
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case 'pdf':
+        return <File className="w-8 h-8 text-red-400" />;
+      case 'spreadsheet':
+        return <FileSpreadsheet className="w-8 h-8 text-green-400" />;
+      case 'image':
+        return <FileImage className="w-8 h-8 text-blue-400" />;
+      default:
+        return <FileText className="w-8 h-8 text-gray-400" />;
+    }
+  };
 
-  const toggleDocumentSelection = (docId: string) => {
-    setSelectedDocuments(prev =>
-      prev.includes(docId)
+  const getStatusColor = (status: string) => {
+    return status === 'completed' 
+      ? 'bg-emerald-500/20 text-emerald-400' 
+      : 'bg-blue-500/20 text-blue-400';
+  };
+
+  const toggleDocSelection = (docId: number) => {
+    setSelectedDocs(prev => 
+      prev.includes(docId) 
         ? prev.filter(id => id !== docId)
         : [...prev, docId]
     );
   };
 
-  const selectAllDocuments = () => {
-    if (selectedDocuments.length === filteredDocuments.length) {
-      setSelectedDocuments([]);
-    } else {
-      setSelectedDocuments(filteredDocuments.map(doc => doc.id));
-    }
+  const toggleAllSelection = () => {
+    setSelectedDocs(
+      selectedDocs.length === documents.length 
+        ? [] 
+        : documents.map(doc => doc.id)
+    );
   };
 
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case 'pdf':
-        return <FileText className="w-5 h-5" />;
-      case 'xlsx':
-      case 'xls':
-        return <FileSpreadsheet className="w-5 h-5" />;
-      case 'jpg':
-      case 'png':
-      case 'gif':
-        return <FileImage className="w-5 h-5" />;
-      default:
-        return <File className="w-5 h-5" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ready':
-        return 'text-green-400';
-      case 'processing':
-      case 'transcribing':
-        return 'text-blue-400';
-      case 'error':
-        return 'text-red-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'ready':
-        return t("ready");
-      case 'processing':
-        return t("processing");
-      case 'transcribing':
-        return t("transcribing");
-      case 'error':
-        return t("error");
-      default:
-        return status;
-    }
-  };
-
-  const handleBulkAction = (action: string) => {
-    console.log(`Action ${action} sur ${selectedDocuments.length} documents`);
-    // Implémenter les actions en masse
-  };
+  const filteredDocuments = documents.filter(doc => {
+    const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === 'all' || doc.type === filterType;
+    return matchesSearch && matchesType;
+  });
 
   return (
     <div className="p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">{t('title', 'Documents')}</h1>
-        <p className="text-gray-400">{t('subtitle', 'Gérez vos documents et fichiers texte')}</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('title')}</h1>
+        <p className="text-gray-400">{t('subtitle')}</p>
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-gray-800 rounded-lg p-4 mb-6">
-        <div className="flex flex-col lg:flex-row gap-4">
-          {/* Recherche */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder={t("searchPlaceholder", "Rechercher par nom ou tag...")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-            />
+      {/* Actions Bar */}
+      <div className="flex flex-col lg:flex-row gap-4 mb-6">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+          <input
+            type="text"
+            placeholder={t('searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+        
+        <div className="flex gap-2">
+          {/* Filter Dropdown */}
+          <div className="relative">
+            <button className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2">
+              <Filter className="w-4 h-4" />
+              {t('filters')}
+              <ChevronDown className="w-4 h-4" />
+            </button>
           </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-2">
-            {/* Vue */}
-            <div className="flex bg-gray-700 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded ${viewMode === 'grid' ? 'bg-gray-600 text-white' : 'text-gray-400'}`}
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded ${viewMode === 'list' ? 'bg-gray-600 text-white' : 'text-gray-400'}`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Filtres */}
+          
+          {/* View Mode Toggle */}
+          <div className="flex bg-gray-800 rounded-lg p-1">
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                showFilters ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'grid' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Filter className="w-4 h-4" />
-              {t('filters', 'Filtres')}
+              <Grid className="w-4 h-4" />
             </button>
-
-            {/* Upload */}
-            <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-              <Upload className="w-4 h-4" />
-              {t('import', 'Importer')}
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'list' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <List className="w-4 h-4" />
             </button>
           </div>
+          
+          {/* Upload Button */}
+          <button 
+            onClick={() => setShowUploadModal(true)}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+            style={{ backgroundColor: '#6366f1' }}
+          >
+            <Upload className="w-4 h-4" />
+            {t('upload')}
+          </button>
         </div>
-
-        {/* Filtres étendus */}
-        {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">{t("type")}</label>
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                >
-                  <option value="all">{t("allTypes")}</option>
-                  <option value="pdf">PDF</option>
-                  <option value="docx">Word</option>
-                  <option value="xlsx">Excel</option>
-                  <option value="txt">{t("text", "Texte")}</option>
-                  <option value="pptx">PowerPoint</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">{t("status")}</label>
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                >
-                  <option value="all">{t("allStatuses")}</option>
-                  <option value="ready">{t("ready")}</option>
-                  <option value="processing">{t("processing")}</option>
-                  <option value="transcribing">{t("transcribing")}</option>
-                  <option value="error">{t("error")}</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Trier par</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
-                >
-                  <option value="uploadDate">Date d'upload</option>
-                  <option value="modifiedDate">Date de modification</option>
-                  <option value="name">{t("name")}</option>
-                  <option value="size">{t("size")}</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">{t("order")}</label>
-                <button
-                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white flex items-center justify-center gap-2 hover:bg-gray-600"
-                >
-                  {sortOrder === 'asc' ? (
-                    <>
-                      <SortAsc className="w-4 h-4" />
-                      Croissant
-                    </>
-                  ) : (
-                    <>
-                      <SortDesc className="w-4 h-4" />
-                      Décroissant
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Actions de sélection */}
-      {selectedDocuments.length > 0 && (
-        <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 mb-6 flex items-center justify-between">
-          <span className="text-blue-400">
-            {t('documentsSelected', { count: selectedDocuments.length })}
-          </span>
+      {/* Selection Info Bar */}
+      {selectedDocs.length > 0 && (
+        <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleAllSelection}
+              className="w-5 h-5 rounded border-2 border-gray-600 flex items-center justify-center"
+            >
+              {selectedDocs.length === documents.length && (
+                <Check className="w-3 h-3 text-indigo-400" />
+              )}
+            </button>
+            <span className="text-gray-300">
+              {t('selectedCount', { count: selectedDocs.length })}
+            </span>
+          </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleBulkAction('download')}
-              className="px-3 py-1 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
-            >
-              Télécharger
+            <button className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700">
+              <Download className="w-5 h-5" />
             </button>
-            <button
-              onClick={() => handleBulkAction('delete')}
-              className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-            >
-              Supprimer
+            <button className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700">
+              <FolderOpen className="w-5 h-5" />
             </button>
-            <button
-              onClick={() => setSelectedDocuments([])}
-              className="px-3 py-1 text-gray-400 hover:text-white text-sm"
-            >
-              Annuler
+            <button className="p-2 text-gray-400 hover:text-red-400 rounded-lg hover:bg-gray-700">
+              <Trash2 className="w-5 h-5" />
             </button>
           </div>
         </div>
       )}
 
-      {/* Liste des documents */}
+      {/* Documents Grid/List */}
       {viewMode === 'grid' ? (
-        // Vue Grille
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredDocuments.map((doc) => (
             <div
               key={doc.id}
-              className={`bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition-all border ${
-                selectedDocuments.includes(doc.id) ? 'border-purple-500' : 'border-gray-700'
+              className={`bg-gray-800 rounded-lg p-6 border transition-all cursor-pointer ${
+                selectedDocs.includes(doc.id) 
+                  ? 'border-indigo-500 bg-gray-750' 
+                  : 'border-gray-700 hover:border-gray-600'
               }`}
+              onClick={() => toggleDocSelection(doc.id)}
             >
-              <div className="flex items-start justify-between mb-3">
-                <button
-                  onClick={() => toggleDocumentSelection(doc.id)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  {selectedDocuments.includes(doc.id) ? (
-                    <CheckSquare className="w-5 h-5 text-purple-500" />
-                  ) : (
-                    <Square className="w-5 h-5" />
-                  )}
-                </button>
-                <DropdownMenu docId={doc.id} />
-              </div>
-
-              <div className="flex flex-col items-center text-center mb-4">
-                <div className={`p-4 rounded-lg mb-3 ${
-                  doc.type === 'pdf' ? 'bg-red-900/20 text-red-400' :
-                  doc.type === 'docx' ? 'bg-blue-900/20 text-blue-400' :
-                  doc.type === 'xlsx' ? 'bg-green-900/20 text-green-400' :
-                  'bg-gray-700 text-gray-400'
-                }`}>
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
                   {getFileIcon(doc.type)}
+                  <div className="w-5 h-5 rounded border-2 border-gray-600 flex items-center justify-center">
+                    {selectedDocs.includes(doc.id) && (
+                      <Check className="w-3 h-3 text-indigo-400" />
+                    )}
+                  </div>
                 </div>
-                
-                <h3 className="text-white font-medium text-sm mb-1 truncate w-full">
-                  {doc.name}
-                </h3>
-                
-                <p className="text-gray-400 text-xs">{doc.size}</p>
+                <button 
+                  className="text-gray-400 hover:text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                >
+                  <MoreVertical className="w-5 h-5" />
+                </button>
               </div>
 
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">{t("status")}</span>
-                  <span className={getStatusColor(doc.status)}>
-                    {getStatusText(doc.status)}
-                  </span>
+              <h3 className="font-medium text-white mb-2 truncate">{doc.name}</h3>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between text-gray-400">
+                  <span>{t('size')}:</span>
+                  <span>{doc.size}</span>
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">{t("modified")}</span>
-                  <span className="text-gray-400">
-                    {new Date(doc.modifiedDate).toLocaleDateString('fr-FR')}
-                  </span>
+                <div className="flex items-center justify-between text-gray-400">
+                  <span>{t('date')}:</span>
+                  <span>{doc.date}</span>
                 </div>
+                <div className="flex items-center justify-between text-gray-400">
+                  <span>{t('author')}:</span>
+                  <span>{doc.author}</span>
+                </div>
+              </div>
 
-                {doc.languages.length > 0 && (
-                  <div className="flex items-center gap-1 mt-2">
-                    {doc.languages.map(lang => (
-                      <span key={lang} className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-300">
-                        {lang}
-                      </span>
-                    ))}
-                  </div>
-                )}
+              <div className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(doc.status)}`}>
+                  {doc.status === 'completed' ? t('status.completed') : t('status.processing')}
+                </span>
+                <div className="flex gap-1">
+                  <button className="p-1 text-gray-400 hover:text-white rounded">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="p-1 text-gray-400 hover:text-white rounded">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        // Vue Liste
         <div className="bg-gray-800 rounded-lg overflow-hidden">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="p-4 text-left">
+            <thead className="bg-gray-900 border-b border-gray-700">
+              <tr>
+                <th className="w-10 px-6 py-3">
                   <button
-                    onClick={selectAllDocuments}
-                    className="text-gray-400 hover:text-white"
+                    onClick={toggleAllSelection}
+                    className="w-5 h-5 rounded border-2 border-gray-600 flex items-center justify-center"
                   >
-                    {selectedDocuments.length === filteredDocuments.length ? (
-                      <CheckSquare className="w-5 h-5 text-purple-500" />
-                    ) : (
-                      <Square className="w-5 h-5" />
+                    {selectedDocs.length === documents.length && (
+                      <Check className="w-3 h-3 text-indigo-400" />
                     )}
                   </button>
                 </th>
-                <th className="p-4 text-left text-gray-400 font-medium">{t("name")}</th>
-                <th className="p-4 text-left text-gray-400 font-medium">{t("size")}</th>
-                <th className="p-4 text-left text-gray-400 font-medium">{t("status")}</th>
-                <th className="p-4 text-left text-gray-400 font-medium">{t("modified")}</th>
-                <th className="p-4 text-left text-gray-400 font-medium">{t("languages")}</th>
-                <th className="p-4 text-left text-gray-400 font-medium">{t("owner")}</th>
-                <th className="p-4"></th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('name')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('type')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('size')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('date')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('author')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('status')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('actions')}
+                </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-700">
               {filteredDocuments.map((doc) => (
-                <tr
+                <tr 
                   key={doc.id}
-                  className={`border-b border-gray-700 hover:bg-gray-750 ${
-                    selectedDocuments.includes(doc.id) ? 'bg-gray-750' : ''
+                  className={`hover:bg-gray-750 transition-colors ${
+                    selectedDocs.includes(doc.id) ? 'bg-gray-750' : ''
                   }`}
                 >
-                  <td className="p-4">
+                  <td className="px-6 py-4">
                     <button
-                      onClick={() => toggleDocumentSelection(doc.id)}
-                      className="text-gray-400 hover:text-white"
+                      onClick={() => toggleDocSelection(doc.id)}
+                      className="w-5 h-5 rounded border-2 border-gray-600 flex items-center justify-center"
                     >
-                      {selectedDocuments.includes(doc.id) ? (
-                        <CheckSquare className="w-5 h-5 text-purple-500" />
-                      ) : (
-                        <Square className="w-5 h-5" />
+                      {selectedDocs.includes(doc.id) && (
+                        <Check className="w-3 h-3 text-indigo-400" />
                       )}
                     </button>
                   </td>
-                  <td className="p-4">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded ${
-                        doc.type === 'pdf' ? 'bg-red-900/20 text-red-400' :
-                        doc.type === 'docx' ? 'bg-blue-900/20 text-blue-400' :
-                        doc.type === 'xlsx' ? 'bg-green-900/20 text-green-400' :
-                        'bg-gray-700 text-gray-400'
-                      }`}>
-                        {getFileIcon(doc.type)}
-                      </div>
+                      <div className="w-8 h-8">{getFileIcon(doc.type)}</div>
                       <span className="text-white font-medium">{doc.name}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-gray-400">{doc.size}</td>
-                  <td className="p-4">
-                    <span className={`${getStatusColor(doc.status)} text-sm`}>
-                      {getStatusText(doc.status)}
+                  <td className="px-6 py-4 text-gray-400">{doc.type}</td>
+                  <td className="px-6 py-4 text-gray-400">{doc.size}</td>
+                  <td className="px-6 py-4 text-gray-400">{doc.date}</td>
+                  <td className="px-6 py-4 text-gray-400">{doc.author}</td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(doc.status)}`}>
+                      {doc.status === 'completed' ? t('status.completed') : t('status.processing')}
                     </span>
                   </td>
-                  <td className="p-4 text-gray-400">
-                    {new Date(doc.modifiedDate).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-1">
-                      {doc.languages.map(lang => (
-                        <span key={lang} className="px-2 py-1 bg-gray-700 rounded text-xs text-gray-300">
-                          {lang}
-                        </span>
-                      ))}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <button className="p-1 text-gray-400 hover:text-white rounded">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-1 text-gray-400 hover:text-white rounded">
+                        <Download className="w-4 h-4" />
+                      </button>
+                      <button className="p-1 text-gray-400 hover:text-white rounded">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button className="p-1 text-gray-400 hover:text-red-400 rounded">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                  </td>
-                  <td className="p-4 text-gray-400">{doc.owner}</td>
-                  <td className="p-4">
-                    <DropdownMenu docId={doc.id} />
                   </td>
                 </tr>
               ))}
@@ -552,59 +389,35 @@ const DocumentsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Message si aucun document */}
-      {filteredDocuments.length === 0 && (
-        <div className="text-center py-12">
-          <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 mb-4">{t("noDocuments")}</p>
-          <button className="text-purple-400 hover:text-purple-300">
-            {t("importFirst")}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Composant Menu déroulant
-const DropdownMenu: React.FC<{ docId: string }> = ({ docId }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-      >
-        <MoreVertical className="w-4 h-4 text-gray-400" />
-      </button>
-      
-      {isOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-1 z-20">
-            <button className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2">
-              <Eye className="w-4 h-4" />
-              Aperçu
-            </button>
-            <button className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Télécharger
-            </button>
-            <button className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 flex items-center gap-2">
-              <Edit3 className="w-4 h-4" />
-              Renommer
-            </button>
-            <hr className="my-1 border-gray-700" />
-            <button className="w-full px-4 py-2 text-left text-red-400 hover:bg-gray-700 flex items-center gap-2">
-              <Trash2 className="w-4 h-4" />
-              Supprimer
-            </button>
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">{t('uploadDocument')}</h3>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-300 mb-2">{t('dragDropText')}</p>
+              <p className="text-sm text-gray-500 mb-4">{t('orText')}</p>
+              <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                {t('browseFiles')}
+              </button>
+            </div>
+            
+            <div className="mt-4 text-sm text-gray-400">
+              <p>{t('supportedFormats')}: PDF, DOCX, XLSX, PPTX, PNG, JPG</p>
+              <p>{t('maxSize')}: 50MB</p>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
