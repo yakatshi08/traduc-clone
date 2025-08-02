@@ -1,300 +1,285 @@
-import React, { useState, useMemo } from 'react';
-import { Plus, Search, Filter, FileText, Video, Headphones, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { 
+  Search, 
+  Filter, 
+  Plus,
+  Grid,
+  List,
+  Calendar,
+  Clock,
+  FileText,
+  MoreVertical
+} from 'lucide-react';
 
 interface ProjectsPageProps {
-  onNavigate?: (page: string, projectId?: number) => void; // Modifié pour accepter projectId
+  onProjectClick: (projectId: number) => void;
+  onNewProject: () => void;
 }
 
-const ProjectsPage: React.FC<ProjectsPageProps> = ({ onNavigate }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterType, setFilterType] = useState('all');
+const ProjectsPage: React.FC<ProjectsPageProps> = ({ onProjectClick, onNewProject }) => {
+  const { t } = useTranslation('projects');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Données de démonstration améliorées
   const projects = [
     {
       id: 1,
-      name: 'Conférence Q4 2024',
-      type: 'video',
-      status: 'Terminé',
-      statusKey: 'completed',
-      statusColor: 'text-green-400',
-      date: '15/12/2024',
-      accuracy: '98.5%',
-      duration: '45 min',
-      icon: Video
+      name: "Conférence Q4 2024",
+      date: "15/12/2024",
+      duration: "45 min",
+      status: "completed",
+      accuracy: 98.5,
+      type: "video"
     },
     {
       id: 2,
-      name: 'Rapport médical',
-      type: 'document',
-      status: 'En cours',
-      statusKey: 'processing',
-      statusColor: 'text-blue-400',
-      date: '14/12/2024',
-      accuracy: '-',
-      duration: '12 pages',
-      icon: FileText
+      name: "Rapport médical",
+      date: "14/12/2024",
+      pages: 12,
+      status: "processing",
+      type: "document"
     },
     {
       id: 3,
-      name: 'Podcast Interview',
-      type: 'audio',
-      status: 'Prêt',
-      statusKey: 'ready',
-      statusColor: 'text-yellow-400',
-      date: '13/12/2024',
-      accuracy: '96.2%',
-      duration: '1h 23min',
-      icon: Headphones
+      name: "Podcast Interview",
+      date: "13/12/2024",
+      duration: "1h 23min",
+      status: "ready",
+      accuracy: 96.2,
+      type: "audio"
     },
     {
       id: 4,
-      name: 'Présentation client',
-      type: 'video',
-      status: 'Terminé',
-      statusKey: 'completed',
-      statusColor: 'text-green-400',
-      date: '12/12/2024',
-      accuracy: '97.8%',
-      duration: '30 min',
-      icon: Video
+      name: "Présentation client",
+      date: "12/12/2024",
+      duration: "30 min",
+      status: "completed",
+      accuracy: 99.1,
+      type: "video"
     },
     {
       id: 5,
-      name: 'Transcription légale',
-      type: 'document',
-      status: 'En cours',
-      statusKey: 'processing',
-      statusColor: 'text-blue-400',
-      date: '11/12/2024',
-      accuracy: '-',
-      duration: '25 pages',
-      icon: FileText
+      name: "Transcription légale",
+      date: "11/12/2024",
+      pages: 45,
+      status: "processing",
+      type: "document"
     },
     {
       id: 6,
-      name: 'Enregistrement formation',
-      type: 'audio',
-      status: 'Terminé',
-      statusKey: 'completed',
-      statusColor: 'text-green-400',
-      date: '10/12/2024',
-      accuracy: '99.1%',
-      duration: '2h 15min',
-      icon: Headphones
+      name: "Enregistrement formation",
+      date: "10/12/2024",
+      duration: "2h 15min",
+      status: "ready",
+      accuracy: 97.8,
+      type: "audio"
     }
   ];
 
-  // Filtrage avec useMemo pour optimiser les performances
-  const filteredProjects = useMemo(() => {
-    return projects.filter(project => {
-      const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = filterStatus === 'all' || project.statusKey === filterStatus;
-      const matchesType = filterType === 'all' || project.type === filterType;
-      
-      return matchesSearch && matchesStatus && matchesType;
-    });
-  }, [searchQuery, filterStatus, filterType]);
-
-  // Compteur de filtres actifs
-  const activeFiltersCount = [
-    filterStatus !== 'all',
-    filterType !== 'all'
-  ].filter(Boolean).length;
-
-  const handleResetFilters = () => {
-    setFilterStatus('all');
-    setFilterType('all');
-    setSearchQuery('');
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+      case 'processing':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'ready':
+        return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return t('status.completed');
+      case 'processing':
+        return t('status.processing');
+      case 'ready':
+        return t('status.ready');
+      default:
+        return status;
+    }
+  };
+
+  const filteredProjects = projects.filter(project =>
+    project.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="p-6 pt-8">
-      {/* En-tête */}
+    <div className="p-6"> {/* SUPPRIMÉ ml-64 */}
+      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Projets</h1>
-        <p className="text-gray-400">{filteredProjects.length} projets trouvés</p>
+        <h1 className="text-3xl font-bold text-white mb-2">{t('title')}</h1>
+        <p className="text-gray-400">{t('projectsFound', { count: filteredProjects.length })}</p>
       </div>
 
-      {/* Barre de recherche et actions */}
+      {/* Actions Bar */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
           <input
             type="text"
-            placeholder="Rechercher un projet..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors"
+            placeholder={t('searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
           />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
         </div>
         
-        <button 
-          onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 px-4 py-3 border rounded-lg transition-colors ${
-            showFilters 
-              ? 'bg-purple-600 border-purple-600 text-white' 
-              : 'bg-gray-800 border-gray-700 text-white hover:bg-gray-750'
-          }`}
-        >
-          <Filter className="w-5 h-5" />
-          <span>Filtres</span>
-          {activeFiltersCount > 0 && (
-            <span className="ml-1 px-2 py-0.5 bg-purple-500 rounded-full text-xs">
-              {activeFiltersCount}
-            </span>
-          )}
-        </button>
-        
-        <button 
-          onClick={() => onNavigate?.('new-project')}
-          className="flex items-center gap-2 px-6 py-3 bg-purple-600 rounded-lg text-white hover:bg-purple-700 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Nouveau projet</span>
-        </button>
-      </div>
-
-      {/* Panneau de filtres */}
-      {showFilters && (
-        <div className="bg-gray-800 rounded-lg p-6 mb-6 border border-gray-700" 
-             style={{ animation: 'slideDown 0.3s ease-out' }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">Filtres avancés</h3>
-            {activeFiltersCount > 0 && (
-              <button
-                onClick={handleResetFilters}
-                className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
-              >
-                Réinitialiser tout
-              </button>
-            )}
+        <div className="flex gap-2">
+          <button className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2">
+            <Filter className="w-4 h-4" />
+            {t('filters')}
+          </button>
+          
+          <div className="flex bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'grid' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Grid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded transition-colors ${
+                viewMode === 'list' ? 'bg-gray-700 text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Filtre par statut */}
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Statut
-              </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 cursor-pointer"
-              >
-                <option value="all">Tous les statuts</option>
-                <option value="completed">Terminé</option>
-                <option value="processing">En cours</option>
-                <option value="ready">Prêt</option>
-              </select>
-            </div>
-            
-            {/* Filtre par type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">
-                Type
-              </label>
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 cursor-pointer"
-              >
-                <option value="all">Tous les types</option>
-                <option value="document">Document</option>
-                <option value="video">Vidéo</option>
-                <option value="audio">Audio</option>
-              </select>
-            </div>
-          </div>
+          <button 
+            onClick={onNewProject}
+            className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors flex items-center gap-2"
+            style={{ backgroundColor: '#8b5cf6' }}
+          >
+            <Plus className="w-4 h-4" />
+            {t('newProject')}
+          </button>
         </div>
-      )}
+      </div>
 
-      {/* Grille de projets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProjects.map((project) => {
-          const Icon = project.icon;
-          return (
-            <div 
-              key={project.id} 
-              className="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition-all hover:scale-[1.02] cursor-pointer border border-gray-700"
-              onClick={() => onNavigate?.('project-detail', project.id)} // Modifié pour la navigation
+      {/* Projects Grid/List */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProjects.map((project) => (
+            <div
+              key={project.id}
+              onClick={() => onProjectClick(project.id)}
+              className="bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition-colors cursor-pointer border border-gray-700"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-700 rounded-lg">
-                    <Icon className="w-5 h-5 text-gray-300" />
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    project.type === 'video' ? 'bg-blue-500/20' :
+                    project.type === 'audio' ? 'bg-purple-500/20' :
+                    'bg-orange-500/20'
+                  }`}>
+                    <FileText className={`w-5 h-5 ${
+                      project.type === 'video' ? 'text-blue-400' :
+                      project.type === 'audio' ? 'text-purple-400' :
+                      'text-orange-400'
+                    }`} />
                   </div>
                   <div>
-                    <h3 className="text-white font-medium">{project.name}</h3>
+                    <h3 className="font-semibold text-white">{project.name}</h3>
                     <p className="text-sm text-gray-400">{project.date}</p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-400">Durée:</span>
-                  <span className="text-gray-300">{project.duration}</span>
-                </div>
-                {project.accuracy !== '-' && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">Précision:</span>
-                    <span className="text-gray-300">{project.accuracy}</span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className={`text-sm font-medium ${project.statusColor}`}>
-                  {project.status}
-                </span>
-                <button className="text-gray-400 hover:text-white transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <button className="text-gray-400 hover:text-white">
+                  <MoreVertical className="w-5 h-5" />
                 </button>
               </div>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* Message si aucun résultat */}
-      {filteredProjects.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-400 mb-4">Aucun projet trouvé</p>
-          <button
-            onClick={handleResetFilters}
-            className="text-purple-400 hover:text-purple-300 transition-colors"
-          >
-            Réinitialiser les filtres
-          </button>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">{t('duration')}:</span>
+                  <span className="text-white">{project.duration || `${project.pages} pages`}</span>
+                </div>
+                
+                {project.accuracy && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">{t('accuracy')}:</span>
+                    <span className="text-white">{project.accuracy}%</span>
+                  </div>
+                )}
+
+                <div className="pt-3 border-t border-gray-700">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
+                    {getStatusLabel(project.status)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-gray-800 rounded-lg overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-900 border-b border-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('name')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('type')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('date')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('duration')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('status')}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                  {t('accuracy')}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-700">
+              {filteredProjects.map((project) => (
+                <tr 
+                  key={project.id}
+                  onClick={() => onProjectClick(project.id)}
+                  className="hover:bg-gray-750 cursor-pointer transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-white">{project.name}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-400">{project.type}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-400">{project.date}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-400">
+                      {project.duration || `${project.pages} pages`}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(project.status)}`}>
+                      {getStatusLabel(project.status)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-white">
+                      {project.accuracy ? `${project.accuracy}%` : '-'}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-
-      {/* Animation CSS */}
-      <style jsx>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };

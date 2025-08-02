@@ -92,7 +92,7 @@ const SettingsPage: React.FC = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-6"> {/* SUPPRIMÉ ml-64 */}
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">{t('title')}</h1>

@@ -1,60 +1,34 @@
 {
-  "welcome": {
-    "title": "Bienvenue sur TraducXion V2.5",
-    "subtitle": "Plateforme intelligente de transcription et traduction",
-    "stats": {
-      "users": "{{count}}+ utilisateurs actifs",
-      "languages": "{{count}} langues supportées",
-      "accuracy": "WER < {{value}}%"
-    }
+  "welcome": "Bienvenue sur votre tableau de bord",
+  "subtitle": "Gérez vos projets de transcription et de traduction",
+  "stats": {
+    "totalProjects": "Projets totaux",
+    "hoursTranscribed": "Heures transcrites",
+    "accuracy": "Précision moyenne",
+    "activeTasks": "Tâches actives"
   },
-  "cards": {
-    "totalProjects": {
-      "title": "Projets totaux",
-      "change": "+{{value}}% ce mois"
-    },
-    "inProgress": {
-      "title": "En cours",
-      "subtitle": "{{count}} terminés aujourd'hui"
-    },
-    "completed": {
-      "title": "Terminés",
-      "change": "+{{value}}% ce mois"
-    },
-    "accuracy": {
-      "title": "Précision moyenne",
-      "change": "+{{value}}% ce mois"
-    }
+  "weeklyActivity": "Activité hebdomadaire",
+  "transcriptions": "Transcriptions",
+  "translations": "Traductions",
+  "progressOverview": "Vue d'ensemble des progrès",
+  "completionRate": "Taux de complétion",
+  "recentProjects": "Projets récents",
+  "viewAll": "Voir tout",
+  "status": {
+    "completed": "Terminé",
+    "processing": "En cours",
+    "ready": "Prêt"
   },
-  "quickActions": {
-    "title": "Actions rapides",
-    "newTranscription": "Nouvelle transcription",
-    "importFile": "Importer un fichier",
-    "recentProjects": "Projets récents",
-    "generateXBRL": "Générer XBRL",
-    "exportXBRL": "Exporter au format XBRL",
-    "connectDrive": "Connecter Drive",
-    "cloudProviders": "Google Drive, Dropbox",
-    "offlineMode": "Mode Offline",
-    "cloudSync": "Synchronisation cloud",
-    "transcriptionDesc": "Commencer une nouvelle transcription"
-  },
-  "viewAllProjects": "Voir tous les projets",
-  "aiEngine": {
-    "title": "Moteur IA Hybride Nouvelle Génération",
-    "description": "TraducXion V2.5 utilise une combinaison avancée de Whisper, Deepgram, ElevenLabs et OpenAI avec des modèles fine-tunés pour atteindre une précision de transcription exceptionnelle. Notre système de diarisation avancée et d'analyse contextuelle garantit des résultats professionnels pour tous vos contenus multimédias."
-  },
-  "activity": {
-    "title": "Activité de la semaine",
-    "subtitle": "Transcriptions et traductions",
-    "chart": {
-      "transcriptions": "Transcriptions",
-      "translations": "Traductions"
-    }
-  },
-  "upload": {
-    "title": "Glissez vos fichiers ici",
-    "subtitle": "ou cliquez pour parcourir",
-    "button": "Sélectionner des fichiers"
-  }
+  "quickActions": "Actions rapides",
+  "uploadFile": "Télécharger un fichier",
+  "uploadFileDesc": "Glissez-déposez ou parcourez",
+  "recordAudio": "Enregistrer audio",
+  "recordAudioDesc": "Commencer un nouvel enregistrement",
+  "importUrl": "Importer depuis URL",
+  "importUrlDesc": "YouTube, Vimeo, etc.",
+  "browseProjects": "Parcourir les projets",
+  "browseProjectsDesc": "Voir tous vos projets",
+  "newFeature": "Nouvelle fonctionnalité !",
+  "newFeatureDesc": "Découvrez notre outil de sous-titrage automatique avec synchronisation IA.",
+  "learnMore": "En savoir plus"
 }
