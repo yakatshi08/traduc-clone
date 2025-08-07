@@ -15,5 +15,11 @@
   "tools": "Werkzeuge",
   "profile": {
     "plan": "{{plan}} Plan"
+  },
+  "theme": {
+    "beige": "Beige",
+    "dark": "Sombre",
+    "toggleBeige": "Activer le mode beige",
+    "toggleDark": "Activer le mode sombre"
   }
 }
