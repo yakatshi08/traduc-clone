@@ -5,60 +5,80 @@ import {
   Link2, 
   FolderOpen,
   Video,
-  ArrowRight
+  ArrowRight,
+  Sparkles // Import ajouté
 } from 'lucide-react';
 
 const QuickActions: React.FC = () => {
   const actions = [
     {
+      id: 1,
+      title: 'Nouvelle transcription',
+      icon: Sparkles,
+      label: 'Nouvelle transcription',
+      description: 'Commencer maintenant',
+      color: 'from-amber-600 to-orange-600',
+      onClick: () => window.location.href = '#transcription'
+    },
+    {
       icon: Upload,
       label: 'Télécharger un fichier',
       description: 'Glissez-déposez ou parcourez',
-      color: 'from-violet-600 to-indigo-600'
+      color: 'from-violet-600 to-indigo-600',
+      onClick: () => {} // Fonction vide pour les autres actions
     },
     {
       icon: Mic,
       label: 'Enregistrer audio',
       description: 'Commencer un nouvel enregistrement',
-      color: 'from-red-600 to-pink-600'
+      color: 'from-red-600 to-pink-600',
+      onClick: () => {}
     },
     {
       icon: Link2,
       label: 'Importer depuis URL',
       description: 'YouTube, Vimeo, etc.',
-      color: 'from-blue-600 to-cyan-600'
+      color: 'from-blue-600 to-cyan-600',
+      onClick: () => {}
     },
     {
       icon: FolderOpen,
       label: 'Parcourir les projets',
       description: 'Voir tous vos projets',
-      color: 'from-emerald-600 to-green-600'
+      color: 'from-emerald-600 to-green-600',
+      onClick: () => {}
     }
   ];
+
+  // Fonction pour obtenir les classes du bouton en fonction de la couleur
+  const getButtonClass = (color: string) => {
+    return `bg-gradient-to-br ${color} hover:opacity-90`;
+  };
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
       <h3 className="text-lg font-semibold text-white mb-6">Actions rapides</h3>
       
       <div className="space-y-3">
-        {actions.map((action, index) => (
+        {actions.map((action) => (
           <button
-            key={index}
-            className="w-full p-4 bg-gray-900/50 rounded-lg hover:bg-gray-700/50 transition-all group text-left"
+            key={action.id}
+            onClick={action.onClick}
+            className={`w-full p-4 ${getButtonClass(action.color)} rounded-lg transition-all group text-left`}
           >
             <div className="flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} flex items-center justify-center flex-shrink-0`}>
+              <div className={`w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0`}>
                 <action.icon className="w-5 h-5 text-white" />
               </div>
               
               <div className="flex-1">
-                <h4 className="font-medium text-white group-hover:text-indigo-400 transition-colors">
+                <h4 className="font-medium text-white group-hover:text-white transition-colors">
                   {action.label}
                 </h4>
-                <p className="text-xs text-gray-400 mt-0.5">{action.description}</p>
+                <p className="text-xs text-white/80 mt-0.5">{action.description}</p>
               </div>
               
-              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+              <ArrowRight className="w-4 h-4 text-white/70 group-hover:text-white transition-colors" />
             </div>
           </button>
         ))}

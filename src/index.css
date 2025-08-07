@@ -72,3 +72,18 @@
 }
 
 /* Les couleurs violet, indigo, etc. restent IDENTIQUES */
+
+/* Mode Beige */
+.beige {
+  --bg-primary: #faf8f5;
+  --bg-secondary: #f5f0e6;
+  --bg-surface: #ffffff;
+  --text-primary: #3d2914;
+  --text-secondary: #604a36;
+  --border-color: #e0d0b8;
+}
+
+.beige body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
