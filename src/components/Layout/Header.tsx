@@ -331,7 +331,7 @@ const Header: React.FC<HeaderProps> = ({
             {/* Bouton Transcription pour mobile */}
             <button
               onClick={() => { onTabChange('transcription'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
+              className="w-full flex items-center gap极3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
             >
               <Sparkles className="w-5 h-5" />
               Transcription
@@ -349,7 +349,7 @@ const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => { onTabChange('videos'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
+              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover极:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
             >
               <Video className="w-5 h-5" />
               Videos
