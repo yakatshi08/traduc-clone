@@ -18,7 +18,8 @@ import {
   Moon,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  CreditCard
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -61,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 beige:bg-traduc-beige-100 border-b border-traduc-beige-300 dark:border-gray-800 transition-colors duration-300">
-      <div className="flex items-center justify-between h-16 px-6">
+      <div className="flex items-center justify-between h-极16 px-6">
         {/* Logo */}
         <div className="flex items-center gap-4">
           <button
@@ -101,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onTabChange('projects')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
+            className={`极flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
               activeTab === 'projects' 
                 ? 'bg-traduc-indigo text-white' 
                 : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
@@ -123,7 +124,7 @@ const Header: React.FC<HeaderProps> = ({
             <span>Analytics</span>
           </button>
 
-          {/* Bouton Transcription ajouté ici */}
+          {/* Bouton Transcription */}
           <button
             onClick={() => onTabChange('transcription')}
             className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
@@ -331,7 +332,7 @@ const Header: React.FC<HeaderProps> = ({
             {/* Bouton Transcription pour mobile */}
             <button
               onClick={() => { onTabChange('transcription'); onMenuClick(); }}
-              className="w-full flex items-center gap极3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
+              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
             >
               <Sparkles className="w-5 h-5" />
               Transcription
@@ -349,7 +350,7 @@ const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => { onTabChange('videos'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover极:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
+              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
             >
               <Video className="w-5 h-5" />
               Videos
