@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  avatar        String?
+  role          Role      @default(USER)
+  plan          Plan      @default(FREE)
+  language      String    @default("fr")
+  
+  // Quotas
+  minutesUsed   Int       @default(0)
+  minutesLimit  Int       @default(60)
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Relations
+  projects      Project[]
+  documents     Document[]
+  transcriptions Transcription[]
+  
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        ProjectType @default(GENERAL)
+  status      ProjectStatus @default(ACTIVE)
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents   Document[]
+  transcriptions Transcription[]
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("projects")
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  name        String
+  filename    String
+  url         String
+  size        Int
+  format      String
+  type        DocumentType
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  transcriptions Transcription[]
+  
+  // Metadata
+  language    String?
+  duration    Int?     // en secondes pour audio/video
+  wordCount   Int?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("documents")
+}
+
+model Transcription {
+  id          String   @id @default(cuid())
+  content     String
+  status      TranscriptionStatus @default(PROCESSING)
+  engine      String   @default("whisper")
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  // Metadata
+  language    String
+  confidence  Float?
+  duration    Int?
+  wordCount   Int?
+  
+  // Timestamps
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("transcriptions")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+  ENTERPRISE
+}
+
+enum ProjectType {
+  GENERAL
+  MEDICAL
+  LEGAL
+  EDUCATION
+  BUSINESS
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  DELETED
+}
+
+enum DocumentType {
+  TRANSCRIPTION
+  TRANSLATION
+  ORIGINAL
+}
+
+enum TranscriptionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  ERROR
+}
