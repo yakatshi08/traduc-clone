@@ -1,21 +1,19 @@
-// C:\PROJETS-DEVELOPPEMENT\traduc-clone\frontend\src\services\api.ts
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000/api';
 
-// Instance axios
+// Créer une instance axios
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true,
+    'Content-Type': 'application/json'
+  }
 });
 
-// Intercepteur pour ajouter le token JWT automatiquement
+// Intercepteur pour ajouter le token à chaque requête
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -24,158 +22,128 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Intercepteur pour gérer les erreurs
+// Intercepteur pour gérer les erreurs 401
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-/**
- * Fonction de login unique (à utiliser partout dans l'app)
- * Usage : const data = await login(email, password)
- */
-export const login = async (email: string, password: string) => {
-  const response = await api.post('/auth/login', { email, password });
-  if (response.data?.token) {
-    localStorage.setItem('token', response.data.token);
-    if (response.data?.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-  }
-  return response.data;
-};
-
-// Services d'authentification (sans .login)
+// Service d'authentification
 export const authService = {
-  async register(data: { name: string; email: string; password: string }) {
-    const response = await api.post('/auth/register', data);
-    if (response.data.token) {
+  login: async (credentials: { email: string; password: string }) => {
+    const response = await api.post('/auth/login', credentials);
+    
+    if (response.data.success) {
+      // Stocker le token et l'utilisateur
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      return response.data;
     }
-    return response.data;
+    throw new Error(response.data.message || 'Erreur de connexion');
   },
 
-  async logout() {
+  register: async (data: { name: string; email: string; password: string }) => {
+    const response = await api.post('/auth/register', data);
+    
+    if (response.data.success) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      return response.data;
+    }
+    throw new Error(response.data.message || 'Erreur d\'inscription');
+  },
+
+  logout: async () => {
     try {
       await api.post('/auth/logout');
-    } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    } catch (error) {
+      console.error('Erreur logout API:', error);
     }
+    
+    // Nettoyer le stockage local dans tous les cas
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
   },
 
-  async getCurrentUser() {
+  getCurrentUser: async () => {
     const response = await api.get('/auth/me');
-    return response.data;
+    return response.data.data;
   },
 
-  async updateProfile(data: any) {
-    const response = await api.put('/auth/profile', data);
-    localStorage.setItem('user', JSON.stringify(response.data));
-    return response.data;
+  refreshToken: async () => {
+    const response = await api.post('/auth/refresh');
+    if (response.data.success) {
+      localStorage.setItem('token', response.data.token);
+      return response.data.token;
+    }
+    throw new Error('Erreur de rafraîchissement du token');
   }
 };
 
 // Services pour Projects
 export const projectService = {
-  async getAll(params?: { page?: number; limit?: number; search?: string }) {
+  getAll: async (params?: any) => {
     const response = await api.get('/projects', { params });
     return response.data;
   },
 
-  async getById(id: string) {
+  getById: async (id: string) => {
     const response = await api.get(`/projects/${id}`);
     return response.data;
   },
 
-  async create(data: any) {
+  create: async (data: any) => {
     const response = await api.post('/projects', data);
     return response.data;
   },
 
-  async update(id: string, data: any) {
+  update: async (id: string, data: any) => {
     const response = await api.put(`/projects/${id}`, data);
     return response.data;
   },
 
-  async delete(id: string) {
+  delete: async (id: string) => {
     const response = await api.delete(`/projects/${id}`);
     return response.data;
   },
 
-  async getStats() {
+  getStats: async () => {
     const response = await api.get('/projects/stats');
     return response.data;
   }
 };
 
-// Services pour Documents
-export const documentService = {
-  async getAll(params?: any) {
-    const response = await api.get('/documents', { params });
-    return response.data;
-  },
-
-  async getById(id: string) {
-    const response = await api.get(`/documents/${id}`);
-    return response.data;
-  },
-
-  async upload(file: File, projectId?: string) {
+// Service d'upload
+export const uploadService = {
+  uploadFile: async (file: File, projectId: string, onProgress?: (progress: number) => void) => {
     const formData = new FormData();
     formData.append('file', file);
-    if (projectId) {
-      formData.append('projectId', projectId);
-    }
+    formData.append('projectId', projectId);
 
-    const response = await api.post('/documents/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const response = await api.post('/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(progress);
+        }
+      }
     });
-    return response.data;
-  },
 
-  async delete(id: string) {
-    const response = await api.delete(`/documents/${id}`);
-    return response.data;
-  }
-};
-
-// Services pour Transcriptions
-export const transcriptionService = {
-  async create(documentId: string, options?: any) {
-    const response = await api.post('/transcriptions', { documentId, ...options });
-    return response.data;
-  },
-
-  async getById(id: string) {
-    const response = await api.get(`/transcriptions/${id}`);
-    return response.data;
-  },
-
-  async update(id: string, data: any) {
-    const response = await api.put(`/transcriptions/${id}`, data);
-    return response.data;
-  },
-
-  async getStatus(id: string) {
-    const response = await api.get(`/transcriptions/${id}/status`);
-    return response.data;
-  },
-
-  async export(id: string, format: 'srt' | 'vtt' | 'txt' | 'pdf') {
-    const response = await api.get(`/transcriptions/${id}/export`, {
-      params: { format },
-      responseType: 'blob'
-    });
     return response.data;
   }
 };
