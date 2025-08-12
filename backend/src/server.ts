@@ -49,8 +49,8 @@ app.use('/api/transcriptions', transcriptionRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => {
+// Health check - CORRIGÉ : underscore devant req
+app.get('/api/health', (_req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
@@ -58,8 +58,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// Error handling middleware - CORRIGÉ : underscores devant req et next
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
     message: err.message || 'Une erreur est survenue',
@@ -67,8 +67,8 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// 404 handler
-app.use((req, res) => {
+// 404 handler - CORRIGÉ : underscore devant req
+app.use((_req, res) => {
   res.status(404).json({ message: 'Route non trouvée' });
 });
 

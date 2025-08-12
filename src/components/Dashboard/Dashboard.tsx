@@ -1,4 +1,5 @@
 import React from 'react';
+import RecentProjects from './RecentProjects';
 
 const Dashboard: React.FC = () => {
   return (
@@ -66,9 +67,7 @@ const Dashboard: React.FC = () => {
           <h3 className="text-lg font-semibold text-traduc-beige-900 dark:text-white beige:text-traduc-beige-900 mb-4">
             Projets récents
           </h3>
-          <p className="text-traduc-beige-800 dark:text-traduc-info-blue text-sm">
-            Les projets récents apparaîtront ici...
-          </p>
+          <RecentProjects />
         </div>
 
         <div className="bg-traduc-beige-200/30 dark:bg-traduc-info-bg border border-traduc-beige-400/50 dark:border-blue-500/20 rounded-lg p-4 mb-8">
