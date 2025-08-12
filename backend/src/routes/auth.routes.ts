@@ -1,6 +1,14 @@
+// C:\PROJETS-DEVELOPPEMENT\traduc-clone\backend\src\routes\auth.routes.ts
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { register, login, logout, refreshToken, me } from '../controllers/auth.controller';
+import { 
+  register, 
+  login, 
+  logout, 
+  refreshToken,
+  getCurrentUser, 
+  updateProfile 
+} from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validation.middleware';
 
@@ -24,10 +32,13 @@ router.post('/login', [
 // Déconnexion
 router.post('/logout', authenticate, logout);
 
-// Refresh token
+// Rafraîchir le token
 router.post('/refresh', refreshToken);
 
 // Profil utilisateur actuel
-router.get('/me', authenticate, me);
+router.get('/me', authenticate, getCurrentUser);
+
+// Mise à jour du profil
+router.put('/profile', authenticate, updateProfile);
 
 export default router;
