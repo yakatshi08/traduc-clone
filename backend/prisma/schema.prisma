@@ -1,4 +1,3 @@
-// C:\PROJETS-DEVELOPPEMENT\traduc-clone\backend\prisma\schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -31,7 +30,7 @@ model User {
   projects      Project[]
   documents     Document[]
   transcriptions Transcription[]
-  integrations  UserIntegration[]  // NOUVEAU pour Google Drive
+  integrations  UserIntegration[]
   
   @@map("users")
 }
@@ -42,7 +41,7 @@ model Project {
   description String?
   type        ProjectType @default(GENERAL)
   status      ProjectStatus @default(ACTIVE)
-  language    String   @default("fr")  // NOUVEAU
+  language    String   @default("fr")
   
   // Relations
   userId      String
@@ -54,24 +53,24 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  @@index([userId])  // NOUVEAU pour optimisation
+  @@index([userId])
   @@map("projects")
 }
 
 model Document {
   id          String   @id @default(cuid())
   name        String
-  originalName String   // NOUVEAU (nom original du fichier)
-  filename    String   // Garder pour compatibilité
-  path        String   // NOUVEAU (chemin local ou URL Cloudinary)
-  url         String   // Garder pour compatibilité
-  publicId    String?  // NOUVEAU pour Cloudinary
+  originalName String
+  filename    String
+  path        String
+  url         String
+  publicId    String?
   size        Int
   format      String
-  mimeType    String   // NOUVEAU
+  mimeType    String
   type        DocumentType
-  storageType String   @default("local")  // NOUVEAU (local/cloudinary/google-drive)
-  googleDriveId String? // NOUVEAU pour Google Drive
+  storageType String   @default("local")
+  googleDriveId String?
   
   // Relations
   userId      String
@@ -82,28 +81,28 @@ model Document {
   
   // Metadata
   language    String?
-  duration    Int?     // en secondes pour audio/video
+  duration    Int?
   wordCount   Int?
-  status      String   @default("uploaded")  // NOUVEAU
+  status      String   @default("uploaded")
   
   // Timestamps
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  @@index([userId])  // NOUVEAU pour optimisation
-  @@index([projectId])  // NOUVEAU pour optimisation
+  @@index([userId])
+  @@index([projectId])
   @@map("documents")
 }
 
 model Transcription {
   id          String   @id @default(cuid())
-  content     String?  @db.Text  // Changé en optionnel et Text pour long contenu
-  segments    Json?    // NOUVEAU pour Whisper (segments avec timestamps)
-  words       Json?    // NOUVEAU pour Whisper (mots avec timestamps)
-  status      TranscriptionStatus @default(PENDING)  // Changé de PROCESSING à PENDING
+  content     String?  @db.Text
+  segments    Json?
+  words       Json?
+  status      TranscriptionStatus @default(PENDING)
   engine      String   @default("whisper")
-  options     Json?    // NOUVEAU (options de transcription)
-  error       String?  // NOUVEAU (message d'erreur si échec)
+  options     Json?
+  error       String?
   
   // Relations
   userId      String
@@ -115,32 +114,31 @@ model Transcription {
   
   // Metadata
   language    String   @default("fr")
-  confidence  Json?    // Changé de Float? à Json? pour données détaillées
-  accuracy    Float?   // NOUVEAU (précision globale)
-  duration    Int?     // en secondes
+  confidence  Json?
+  accuracy    Float?
+  duration    Int?
   wordCount   Int?
   
   // Timestamps
-  startedAt   DateTime?  // Changé en optionnel
+  startedAt   DateTime?
   completedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  @@index([userId])  // NOUVEAU pour optimisation
-  @@index([projectId])  // NOUVEAU pour optimisation
-  @@index([documentId])  // NOUVEAU pour optimisation
-  @@index([status])  // NOUVEAU pour optimisation
+  @@index([userId])
+  @@index([projectId])
+  @@index([documentId])
+  @@index([status])
   @@map("transcriptions")
 }
 
-// NOUVEAU modèle pour les intégrations (Google Drive, Dropbox, etc.)
 model UserIntegration {
   id              String           @id @default(cuid())
-  provider        String           // google-drive, dropbox, onedrive
+  provider        String
   accessToken     String           @db.Text
   refreshToken    String?          @db.Text
   expiresAt       DateTime?
-  metadata        Json?            // Données supplémentaires spécifiques au provider
+  metadata        Json?
   
   // Relations
   userId          String
@@ -155,7 +153,7 @@ model UserIntegration {
   @@map("user_integrations")
 }
 
-// Enums (garder les existants)
+// Enums
 enum Role {
   ADMIN
   USER
@@ -163,7 +161,7 @@ enum Role {
 
 enum Plan {
   FREE
-  STARTER    // NOUVEAU (pour cohérence avec le cahier des charges)
+  STARTER
   PRO
   BUSINESS
   ENTERPRISE
@@ -179,22 +177,24 @@ enum ProjectType {
 
 enum ProjectStatus {
   ACTIVE
+  COMPLETED
   ARCHIVED
   DELETED
 }
 
 enum DocumentType {
-  DOCUMENT      // Renommé de TRANSCRIPTION
-  AUDIO         // NOUVEAU
-  VIDEO         // NOUVEAU
-  TRANSLATION   // Garder
-  ORIGINAL      // Garder
+  DOCUMENT
+  AUDIO
+  VIDEO
+  TRANSLATION
+  ORIGINAL
+  OTHER
 }
 
 enum TranscriptionStatus {
   PENDING
   PROCESSING
   COMPLETED
-  FAILED       // Renommé de ERROR
-  CANCELLED    // NOUVEAU
+  FAILED
+  CANCELLED
 }
