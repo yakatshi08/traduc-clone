@@ -1,517 +1,656 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
+  Music,
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
+  VolumeX,
+  Upload,
   Download,
+  Trash2,
+  Share2,
+  Search,
   Filter,
-  FileText,
-  Users,
+  Grid,
+  List,
   Clock,
-  Globe,
-  DollarSign,
+  FileAudio,
   Activity,
-  PieChart,
-  ArrowUpRight,
-  ArrowDownRight,
-  RefreshCw,
+  Plus,
+  X,
+  Loader2,
+  Brain,
+  Languages,
+  Globe,
+  Target,
+  Star,
+  StarOff,
+  ChevronUp,
   ChevronDown,
-  FileSpreadsheet,
-  File,
-  Printer,
-  Share2
+  Repeat,
+  FileText
 } from 'lucide-react';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart
-} from 'recharts';
-import ReportGeneratorModal from '../components/Modals/ReportGeneratorModal'; // AJOUT IMPORT
+import toast from 'react-hot-toast';
 
-type Period = '7d' | '30d' | '90d' | '12m' | 'custom';
-type ChartType = 'revenue' | 'usage' | 'projects' | 'languages';
+// Types simplifiés
+interface Audio {
+  id: string;
+  name: string;
+  url: string;
+  size: number;
+  duration: number;
+  format: string;
+  bitrate: number;
+  sampleRate: number;
+  channels: number;
+  createdAt: Date;
+  updatedAt: Date;
+  projectName?: string;
+  status: 'pending' | 'processing' | 'transcribed' | 'error';
+  transcription?: string;
+  language?: string;
+  tags: string[];
+  starred: boolean;
+  accuracy?: number;
+  wer?: number;
+  confidence?: number;
+}
 
-const AnalyticsPage: React.FC = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>('30d');
-  const [activeChart, setActiveChart] = useState<ChartType>('revenue');
-  const [showExportMenu, setShowExportMenu] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false); // AJOUT ÉTAT
+interface AudioStats {
+  total: number;
+  transcribed: number;
+  totalDuration: number;
+  totalSize: number;
+  averageAccuracy: number;
+  averageWER: number;
+}
 
-  // Données de démonstration
-  const revenueData = [
-    { date: '01 Jan', revenue: 4500, projets: 12 },
-    { date: '05 Jan', revenue: 5200, projets: 15 },
-    { date: '10 Jan', revenue: 4800, projets: 13 },
-    { date: '15 Jan', revenue: 6100, projets: 18 },
-    { date: '20 Jan', revenue: 5900, projets: 17 },
-    { date: '25 Jan', revenue: 7200, projets: 22 },
-    { date: '30 Jan', revenue: 6800, projets: 20 }
-  ];
+// Composant Player Audio simplifié (sans WaveSurfer pour l'instant)
+const AudioPlayer: React.FC<{
+  audio: Audio;
+  onTranscribe: () => void;
+  onClose: () => void;
+}> = ({ audio, onTranscribe, onClose }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
-  const usageData = [
-    { name: 'Transcription', heures: 156, pourcentage: 65 },
-    { name: 'Traduction', caracteres: 850000, pourcentage: 35 }
-  ];
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (!audioElement) return;
 
-  const languagesData = [
-    { langue: 'Français', projets: 45, couleur: '#3B82F6' },
-    { langue: 'Anglais', projets: 38, couleur: '#8B5CF6' },
-    { langue: 'Espagnol', projets: 22, couleur: '#10B981' },
-    { langue: 'Allemand', projets: 18, couleur: '#F59E0B' },
-    { langue: 'Italien', projets: 12, couleur: '#EF4444' },
-    { langue: 'Autres', projets: 15, couleur: '#6B7280' }
-  ];
+    const updateTime = () => setCurrentTime(audioElement.currentTime);
+    audioElement.addEventListener('timeupdate', updateTime);
 
-  const projectsData = [
-    { mois: 'Août', completés: 32, enCours: 8, nouveaux: 15 },
-    { mois: 'Sept', completés: 28, enCours: 12, nouveaux: 18 },
-    { mois: 'Oct', completés: 35, enCours: 10, nouveaux: 20 },
-    { mois: 'Nov', completés: 42, enCours: 15, nouveaux: 25 },
-    { mois: 'Déc', completés: 38, enCours: 13, nouveaux: 22 },
-    { mois: 'Jan', completés: 45, enCours: 18, nouveaux: 28 }
-  ];
+    return () => {
+      audioElement.removeEventListener('timeupdate', updateTime);
+    };
+  }, []);
 
-  // KPIs
-  const kpis = {
-    revenue: {
-      current: 38400,
-      previous: 32100,
-      change: 19.6,
-      trend: 'up'
-    },
-    projects: {
-      current: 150,
-      previous: 118,
-      change: 27.1,
-      trend: 'up'
-    },
-    avgDuration: {
-      current: '3h 24min',
-      previous: '4h 12min',
-      change: -19.0,
-      trend: 'down'
-    },
-    satisfaction: {
-      current: 4.8,
-      previous: 4.6,
-      change: 4.3,
-      trend: 'up'
-    }
-  };
-
-  // Fonction pour obtenir la couleur selon la tendance
-  const getTrendColor = (trend: string) => {
-    return trend === 'up' ? 'text-green-400' : 'text-red-400';
-  };
-
-  const getTrendIcon = (trend: string) => {
-    return trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />;
-  };
-
-  // Fonction d'export MODIFIÉE
-  const handleExport = (format: 'csv' | 'pdf' | 'print') => {
-    console.log(`Export en ${format}`);
-    setShowExportMenu(false);
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
     
-    if (format === 'csv') {
-      // Simuler l'export CSV
-      const csvContent = "Date,Revenus,Projets\n2025-01-01,4500,12\n2025-01-05,5200,15";
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `analytics-export-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-    } else if (format === 'pdf') {
-      // Simuler l'export PDF
-      alert('Export PDF en cours de développement');
-    } else if (format === 'print') {
-      // Imprimer
-      window.print();
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
     }
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* En-tête */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Analytics</h1>
-          <p className="text-gray-400">Analysez vos performances et tendances</p>
-        </div>
-
-        <div className="flex gap-4">
-          {/* Sélecteur de période */}
-          <div className="relative">
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors">
-              <Calendar className="w-4 h-4" />
-              <span>
-                {selectedPeriod === '7d' && '7 derniers jours'}
-                {selectedPeriod === '30d' && '30 derniers jours'}
-                {selectedPeriod === '90d' && '90 derniers jours'}
-                {selectedPeriod === '12m' && '12 derniers mois'}
-                {selectedPeriod === 'custom' && 'Personnalisé'}
-              </span>
-              <ChevronDown className="w-4 h-4" />
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-lg w-full max-w-2xl">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                <Music className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">{audio.name}</h2>
+                <p className="text-sm text-gray-400">
+                  {formatTime(audio.duration)} • {audio.format.toUpperCase()} • {audio.bitrate} kbps
+                </p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg">
+              <X className="w-5 h-5" />
             </button>
           </div>
+        </div>
 
-          {/* Bouton rafraîchir */}
-          <button className="p-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors">
-            <RefreshCw className="w-4 h-4" />
-          </button>
+        {/* Audio Element */}
+        <audio
+          ref={audioRef}
+          src={audio.url}
+          className="hidden"
+        />
 
-          {/* Menu export */}
-          <div className="relative">
-            <button
-              onClick={() => setShowExportMenu(!showExportMenu)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              Export
-            </button>
-            
-            {showExportMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 z-10">
-                <button
-                  onClick={() => handleExport('csv')}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-700 flex items-center gap-2"
-                >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  Export CSV
-                </button>
-                <button
-                  onClick={() => handleExport('pdf')}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-700 flex items-center gap-2"
-                >
-                  <File className="w-4 h-4" />
-                  Export PDF
-                </button>
-                <button
-                  onClick={() => handleExport('print')}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-700 flex items-center gap-2"
-                >
-                  <Printer className="w-4 h-4" />
-                  Imprimer
-                </button>
-              </div>
+        {/* Simple Progress Bar */}
+        <div className="p-6">
+          <div className="w-full h-2 bg-gray-700 rounded-full">
+            <div 
+              className="h-full bg-indigo-500 rounded-full transition-all"
+              style={{ width: `${(currentTime / audio.duration) * 100}%` }}
+            />
+          </div>
+          <div className="flex justify-between mt-2 text-sm text-gray-400">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(audio.duration)}</span>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="p-6 border-t border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={togglePlayPause}
+                className="p-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg"
+              >
+                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+              </button>
+            </div>
+
+            {!audio.transcription && (
+              <button
+                onClick={onTranscribe}
+                className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg flex items-center gap-2"
+              >
+                <Brain className="w-4 h-4" />
+                Transcrire
+              </button>
             )}
           </div>
         </div>
       </div>
-
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-green-600/20 rounded-lg">
-              <DollarSign className="w-6 h-6 text-green-400" />
-            </div>
-            <div className={`flex items-center gap-1 ${getTrendColor(kpis.revenue.trend)}`}>
-              {getTrendIcon(kpis.revenue.trend)}
-              <span className="text-sm font-medium">+{kpis.revenue.change}%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold mb-1">{kpis.revenue.current.toLocaleString()}€</h3>
-          <p className="text-sm text-gray-400">Revenus totaux</p>
-        </div>
-
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-blue-600/20 rounded-lg">
-              <FileText className="w-6 h-6 text-blue-400" />
-            </div>
-            <div className={`flex items-center gap-1 ${getTrendColor(kpis.projects.trend)}`}>
-              {getTrendIcon(kpis.projects.trend)}
-              <span className="text-sm font-medium">+{kpis.projects.change}%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold mb-1">{kpis.projects.current}</h3>
-          <p className="text-sm text-gray-400">Projets complétés</p>
-        </div>
-
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-purple-600/20 rounded-lg">
-              <Clock className="w-6 h-6 text-purple-400" />
-            </div>
-            <div className={`flex items-center gap-1 ${getTrendColor(kpis.avgDuration.trend)}`}>
-              {getTrendIcon(kpis.avgDuration.trend)}
-              <span className="text-sm font-medium">{kpis.avgDuration.change}%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold mb-1">{kpis.avgDuration.current}</h3>
-          <p className="text-sm text-gray-400">Durée moyenne</p>
-        </div>
-
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-yellow-600/20 rounded-lg">
-              <Activity className="w-6 h-6 text-yellow-400" />
-            </div>
-            <div className={`flex items-center gap-1 ${getTrendColor(kpis.satisfaction.trend)}`}>
-              {getTrendIcon(kpis.satisfaction.trend)}
-              <span className="text-sm font-medium">+{kpis.satisfaction.change}%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold mb-1">{kpis.satisfaction.current}/5</h3>
-          <p className="text-sm text-gray-400">Satisfaction client</p>
-        </div>
-      </div>
-
-      {/* Graphiques principaux */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Graphique principal (2 colonnes) */}
-        <div className="lg:col-span-2 bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Évolution des revenus</h2>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setActiveChart('revenue')}
-                className={`px-3 py-1 rounded text-sm ${
-                  activeChart === 'revenue' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-700 text-gray-300'
-                }`}
-              >
-                Revenus
-              </button>
-              <button
-                onClick={() => setActiveChart('projects')}
-                className={`px-3 py-1 rounded text-sm ${
-                  activeChart === 'projects' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-700 text-gray-300'
-                }`}
-              >
-                Projets
-              </button>
-            </div>
-          </div>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={revenueData}>
-              <defs>
-                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="date" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: '1px solid #374151',
-                  borderRadius: '0.5rem'
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey={activeChart === 'revenue' ? 'revenue' : 'projets'}
-                stroke="#3B82F6"
-                fillOpacity={1}
-                fill="url(#colorRevenue)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Répartition par langue - VERSION AMÉLIORÉE */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-6">Langues populaires</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <RePieChart>
-              <Pie
-                data={languagesData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ langue, projets }) => `${langue}: ${projets}`}
-                outerRadius={100}  // Augmentation du rayon
-                fill="#8884d8"
-                dataKey="projets"
-              >
-                {languagesData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.couleur} />
-                ))}
-              </Pie>
-              <Tooltip 
-                formatter={(value: any) => `${value} projets`}
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: '1px solid #374151',
-                  borderRadius: '0.5rem'
-                }}
-              />
-              <Legend 
-                verticalAlign="middle" 
-                align="right"
-                layout="vertical"
-                iconType="circle"
-                formatter={(value, entry: any) => `${value}: ${entry.payload.projets}`}
-                wrapperStyle={{
-                  paddingLeft: '20px',
-                }}
-              />
-            </RePieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Statistiques détaillées */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Utilisation des services */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-6">Utilisation des services</h2>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-400">Transcription</span>
-                <span className="font-medium">{usageData[0].heures}h ({usageData[0].pourcentage}%)</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-3">
-                <div 
-                  className="bg-blue-500 h-3 rounded-full"
-                  style={{ width: `${usageData[0].pourcentage}%` }}
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-400">Traduction</span>
-                <span className="font-medium">{(usageData[1].caracteres / 1000).toFixed(0)}k car. ({usageData[1].pourcentage}%)</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-3">
-                <div 
-                  className="bg-purple-500 h-3 rounded-full"
-                  style={{ width: `${usageData[1].pourcentage}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-gray-700">
-            <h3 className="font-medium mb-4">Top utilisateurs</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm">
-                    JD
-                  </div>
-                  <span className="text-sm">John Doe</span>
-                </div>
-                <span className="text-sm text-gray-400">42 projets</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-sm">
-                    ML
-                  </div>
-                  <span className="text-sm">Marie Laurent</span>
-                </div>
-                <span className="text-sm text-gray-400">38 projets</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-sm">
-                    PD
-                  </div>
-                  <span className="text-sm">Pierre Dupont</span>
-                </div>
-                <span className="text-sm text-gray-400">35 projets</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Évolution des projets */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-6">Évolution des projets</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={projectsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="mois" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#1F2937',
-                  border: '1px solid #374151',
-                  borderRadius: '0.5rem'
-                }}
-              />
-              <Legend />
-              <Bar dataKey="completés" fill="#10B981" />
-              <Bar dataKey="enCours" fill="#F59E0B" />
-              <Bar dataKey="nouveaux" fill="#3B82F6" />
-            </BarChart>
-          </ResponsiveContainer>
-
-          <div className="mt-6 grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-2xl font-bold text-green-400">45</p>
-              <p className="text-sm text-gray-400">Complétés</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-yellow-400">18</p>
-              <p className="text-sm text-gray-400">En cours</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-400">28</p>
-              <p className="text-sm text-gray-400">Nouveaux</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions rapides */}
-      <div className="mt-8 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg p-6 border border-blue-600/30">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-semibold mb-2">
-              Générer un rapport personnalisé
-            </h3>
-            <p className="text-gray-400">
-              Créez des rapports détaillés avec vos métriques préférées
-            </p>
-          </div>
-          <div className="flex gap-4">
-            <button className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2">
-              <Share2 className="w-4 h-4" />
-              Partager
-            </button>
-            <button 
-              onClick={() => setShowReportModal(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
-            >
-              <FileText className="w-4 h-4" />
-              Créer un rapport
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* MODAL GÉNÉRATEUR DE RAPPORT */}
-      <ReportGeneratorModal
-        isOpen={showReportModal}
-        onClose={() => setShowReportModal(false)}
-      />
     </div>
   );
 };
 
-export default AnalyticsPage;
+// Composant principal AudiosPage
+const AudiosPage: React.FC = () => {
+  const [audios, setAudios] = useState<Audio[]>([]);
+  const [selectedAudio, setSelectedAudio] = useState<Audio | null>(null);
+  const [showPlayer, setShowPlayer] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [stats, setStats] = useState<AudioStats | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    loadAudios();
+  }, []);
+
+  useEffect(() => {
+    calculateStats();
+  }, [audios]);
+
+  const loadAudios = async () => {
+    setIsLoading(true);
+    try {
+      // Données de démonstration
+      const demoAudios: Audio[] = [
+        {
+          id: 'audio_1',
+          name: 'Interview_Patient_Dr_Martin.mp3',
+          url: '#',
+          size: 15728640,
+          duration: 1800,
+          format: 'mp3',
+          bitrate: 192,
+          sampleRate: 44100,
+          channels: 2,
+          createdAt: new Date('2025-01-10'),
+          updatedAt: new Date('2025-01-10'),
+          projectName: 'Consultations Médicales',
+          status: 'transcribed',
+          language: 'fr',
+          transcription: 'Transcription complète de l\'interview médicale...',
+          tags: ['médical', 'consultation'],
+          starred: true,
+          accuracy: 98.5,
+          wer: 2.5,
+          confidence: 0.98
+        },
+        {
+          id: 'audio_2',
+          name: 'Podcast_Marketing_Digital.mp3',
+          url: '#',
+          size: 52428800,
+          duration: 2400,
+          format: 'mp3',
+          bitrate: 256,
+          sampleRate: 48000,
+          channels: 2,
+          createdAt: new Date('2025-01-11'),
+          updatedAt: new Date('2025-01-11'),
+          projectName: 'Podcasts Business',
+          status: 'transcribed',
+          language: 'en',
+          transcription: 'Welcome to our digital marketing podcast...',
+          tags: ['podcast', 'marketing'],
+          starred: false,
+          accuracy: 96.8,
+          wer: 3.2,
+          confidence: 0.95
+        },
+        {
+          id: 'audio_3',
+          name: 'Cours_Droit_Commercial.m4a',
+          url: '#',
+          size: 31457280,
+          duration: 3600,
+          format: 'm4a',
+          bitrate: 256,
+          sampleRate: 44100,
+          channels: 1,
+          createdAt: new Date('2025-01-09'),
+          updatedAt: new Date('2025-01-09'),
+          projectName: 'Cours Universitaires',
+          status: 'processing',
+          language: 'fr',
+          tags: ['cours', 'droit'],
+          starred: false
+        }
+      ];
+
+      setAudios(demoAudios);
+    } catch (error) {
+      console.error('Erreur lors du chargement des audios:', error);
+      toast.error('Erreur lors du chargement des audios');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const calculateStats = () => {
+    if (audios.length === 0) {
+      setStats(null);
+      return;
+    }
+
+    const stats: AudioStats = {
+      total: audios.length,
+      transcribed: audios.filter(a => a.status === 'transcribed').length,
+      totalDuration: audios.reduce((acc, a) => acc + a.duration, 0),
+      totalSize: audios.reduce((acc, a) => acc + a.size, 0),
+      averageAccuracy: audios.filter(a => a.accuracy).reduce((acc, a) => acc + (a.accuracy || 0), 0) / audios.filter(a => a.accuracy).length || 0,
+      averageWER: audios.filter(a => a.wer).reduce((acc, a) => acc + (a.wer || 0), 0) / audios.filter(a => a.wer).length || 0
+    };
+
+    setStats(stats);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    toast.success(`${files.length} audio(s) uploadé(s)`);
+  };
+
+  const handleTranscribe = (audio: Audio) => {
+    setAudios(prev => prev.map(a => 
+      a.id === audio.id 
+        ? { ...a, status: 'processing' as const }
+        : a
+    ));
+
+    setTimeout(() => {
+      setAudios(prev => prev.map(a => 
+        a.id === audio.id 
+          ? { 
+              ...a, 
+              status: 'transcribed' as const,
+              transcription: 'Transcription automatique générée...',
+              language: 'fr',
+              accuracy: 95 + Math.random() * 4,
+              wer: 2 + Math.random() * 2
+            }
+          : a
+      ));
+      
+      toast.success(`${audio.name} transcrit avec succès`);
+    }, 3000);
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+  };
+
+  const formatDuration = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'transcribed': return 'bg-emerald-500';
+      case 'processing': return 'bg-indigo-500';
+      case 'pending': return 'bg-amber-500';
+      case 'error': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const toggleStar = (audioId: string) => {
+    setAudios(audios.map(a => 
+      a.id === audioId ? { ...a, starred: !a.starred } : a
+    ));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-indigo-500 mx-auto mb-4" />
+          <p className="text-gray-400">Chargement des audios...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto p-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+              Audios TraduckXion
+            </h1>
+            <p className="text-gray-400">
+              Gérez vos fichiers audio et transcriptions
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="audio/*"
+              onChange={handleUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center gap-2"
+            >
+              <Upload className="w-4 h-4" />
+              Importer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <Music className="w-5 h-5 text-violet-400" />
+              <span className="text-2xl font-bold">{stats.total}</span>
+            </div>
+            <p className="text-sm text-gray-400">Total audios</p>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <Brain className="w-5 h-5 text-indigo-400" />
+              <span className="text-2xl font-bold">{stats.transcribed}</span>
+            </div>
+            <p className="text-sm text-gray-400">Transcrits</p>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <Clock className="w-5 h-5 text-emerald-400" />
+              <span className="text-xl font-bold">{Math.floor(stats.totalDuration / 3600)}h</span>
+            </div>
+            <p className="text-sm text-gray-400">Durée totale</p>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <Target className="w-5 h-5 text-green-400" />
+              <span className="text-2xl font-bold">{stats.averageAccuracy.toFixed(1)}%</span>
+            </div>
+            <p className="text-sm text-gray-400">Précision moy.</p>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <Activity className="w-5 h-5 text-red-400" />
+              <span className="text-2xl font-bold">{stats.averageWER.toFixed(1)}%</span>
+            </div>
+            <p className="text-sm text-gray-400">WER moyen</p>
+          </div>
+          
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-2">
+              <FileAudio className="w-5 h-5 text-amber-400" />
+              <span className="text-lg font-bold">{formatFileSize(stats.totalSize)}</span>
+            </div>
+            <p className="text-sm text-gray-400">Espace utilisé</p>
+          </div>
+        </div>
+      )}
+
+      {/* Barre de recherche */}
+      <div className="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher des audios..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div className="flex bg-gray-900 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded ${
+                viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'text-gray-400'
+              }`}
+            >
+              <Grid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded ${
+                viewMode === 'list' ? 'bg-indigo-600 text-white' : 'text-gray-400'
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Liste des audios */}
+      {audios.length === 0 ? (
+        <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
+          <Music className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-400 mb-2">Aucun audio trouvé</p>
+          <p className="text-sm text-gray-500">
+            Importez vos premiers fichiers audio pour commencer
+          </p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {audios.map(audio => (
+            <div
+              key={audio.id}
+              className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-gray-600"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                    <Music className="w-5 h-5 text-white" />
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => toggleStar(audio.id)}
+                  className="p-1 hover:bg-gray-700 rounded"
+                >
+                  {audio.starred ? (
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                  ) : (
+                    <StarOff className="w-4 h-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+
+              <h3 className="font-medium mb-1 truncate">{audio.name}</h3>
+              {audio.projectName && (
+                <p className="text-sm text-gray-400 mb-3">{audio.projectName}</p>
+              )}
+
+              <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                <span>{formatDuration(audio.duration)}</span>
+                <span>•</span>
+                <span>{audio.format.toUpperCase()}</span>
+                <span>•</span>
+                <span>{formatFileSize(audio.size)}</span>
+              </div>
+
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`w-2 h-2 rounded-full ${getStatusColor(audio.status)}`} />
+                <span className="text-xs text-gray-400">{audio.status}</span>
+                
+                {audio.accuracy && (
+                  <span className="text-xs text-emerald-400 ml-auto">
+                    {audio.accuracy.toFixed(1)}%
+                  </span>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setSelectedAudio(audio);
+                    setShowPlayer(true);
+                  }}
+                  className="flex-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-sm"
+                >
+                  <Play className="w-4 h-4 inline mr-1" />
+                  Écouter
+                </button>
+                
+                {!audio.transcription && (
+                  <button
+                    onClick={() => handleTranscribe(audio)}
+                    className="px-3 py-1 bg-violet-600 hover:bg-violet-700 text-white rounded text-sm"
+                  >
+                    <Brain className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-700">
+                <th className="px-4 py-3 text-left">Nom</th>
+                <th className="px-4 py-3 text-left">Durée</th>
+                <th className="px-4 py-3 text-left">Format</th>
+                <th className="px-4 py-3 text-left">Statut</th>
+                <th className="px-4 py-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {audios.map(audio => (
+                <tr key={audio.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-indigo-600 rounded flex items-center justify-center">
+                        <Music className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <div className="font-medium">{audio.name}</div>
+                        {audio.projectName && (
+                          <div className="text-xs text-gray-400">{audio.projectName}</div>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm">{formatDuration(audio.duration)}</td>
+                  <td className="px-4 py-3">
+                    <span className="text-xs px-2 py-1 bg-gray-700 rounded">
+                      {audio.format.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`w-2 h-2 rounded-full inline-block ${getStatusColor(audio.status)}`} />
+                    <span className="ml-2 text-sm">{audio.status}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedAudio(audio);
+                          setShowPlayer(true);
+                        }}
+                        className="p-1 hover:bg-gray-600 rounded"
+                      >
+                        <Play className="w-4 h-4" />
+                      </button>
+                      {!audio.transcription && (
+                        <button
+                          onClick={() => handleTranscribe(audio)}
+                          className="p-1 hover:bg-gray-600 rounded"
+                        >
+                          <Brain className="w-4 h-4 text-violet-400" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Player Modal */}
+      {showPlayer && selectedAudio && (
+        <AudioPlayer
+          audio={selectedAudio}
+          onTranscribe={() => handleTranscribe(selectedAudio)}
+          onClose={() => {
+            setShowPlayer(false);
+            setSelectedAudio(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default AudiosPage;

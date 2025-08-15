@@ -1,4 +1,3 @@
-// C:\PROJETS-DEVELOPPEMENT\traduc-clone\backend\prisma\schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,164 +8,362 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String?
-  avatar        String?
-  role          Role      @default(USER)
-  plan          Plan      @default(FREE)
-  language      String    @default("fr")
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  password              String
+  name                  String?
+  company               String?  // AJOUT pour entreprises
+  avatar                String?
+  role                  Role      @default(USER)
+  plan                  Plan      @default(FREE)
+  language              String    @default("fr")
   
-  // Quotas
-  minutesUsed   Int       @default(0)
-  minutesLimit  Int       @default(60)
+  // Vérification et sécurité - NOUVEAU
+  isVerified            Boolean   @default(false)
+  verificationToken     String?   @unique
+  emailVerifiedAt       DateTime?
+  resetPasswordToken    String?   @unique
+  resetPasswordExpires  DateTime?
+  
+  // Quotas améliorés
+  minutesUsed           Int       @default(0)
+  minutesLimit          Int       @default(60)
+  storageUsed           BigInt    @default(0)  // en bytes
+  storageLimit          BigInt    @default(5368709120) // 5GB par défaut
+  apiCallsUsed          Int       @default(0)  // NOUVEAU
+  apiCallsLimit         Int       @default(1000) // NOUVEAU
+  
+  // Statut et connexion
+  isActive              Boolean   @default(true)
+  isBlocked             Boolean   @default(false)
+  failedLoginAttempts   Int       @default(0)
+  lastLoginAt           DateTime?
+  lastFailedLoginAt     DateTime?
   
   // Timestamps
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  deletedAt             DateTime? // Soft delete
   
   // Relations
-  projects      Project[]
-  documents     Document[]
-  transcriptions Transcription[]
-  integrations  UserIntegration[]  // NOUVEAU pour Google Drive
+  projects              Project[]
+  documents             Document[]
+  transcriptions        Transcription[]
+  integrations          UserIntegration[]
+  sessions              Session[]  // NOUVEAU
+  activities            Activity[] // NOUVEAU
+  notifications         Notification[] // NOUVEAU
+  collaborations        ProjectCollaborator[] // NOUVEAU
+  comments              Comment[]  // NOUVEAU
   
+  @@index([email])
+  @@index([resetPasswordToken])
+  @@index([verificationToken])
   @@map("users")
 }
 
+// NOUVEAU - Sessions pour JWT et sécurité
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token       String   @unique
+  userAgent   String?
+  ipAddress   String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  
+  @@index([token])
+  @@index([userId])
+  @@map("sessions")
+}
+
 model Project {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  type        ProjectType @default(GENERAL)
-  status      ProjectStatus @default(ACTIVE)
-  language    String   @default("fr")  // NOUVEAU
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  type            ProjectType @default(GENERAL)
+  status          ProjectStatus @default(ACTIVE)
+  language        String   @default("fr")
+  color           String?  // NOUVEAU pour UI
+  icon            String?  // NOUVEAU pour UI
   
-  // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  documents   Document[]
-  transcriptions Transcription[]
-  
-  // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([userId])  // NOUVEAU pour optimisation
-  @@map("projects")
-}
-
-model Document {
-  id          String   @id @default(cuid())
-  name        String
-  originalName String   // NOUVEAU (nom original du fichier)
-  filename    String   // Garder pour compatibilité
-  path        String   // NOUVEAU (chemin local ou URL Cloudinary)
-  url         String   // Garder pour compatibilité
-  publicId    String?  // NOUVEAU pour Cloudinary
-  size        Int
-  format      String
-  mimeType    String   // NOUVEAU
-  type        DocumentType
-  storageType String   @default("local")  // NOUVEAU (local/cloudinary/google-drive)
-  googleDriveId String? // NOUVEAU pour Google Drive
-  
-  // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projectId   String?
-  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  transcriptions Transcription[]
-  
-  // Metadata
-  language    String?
-  duration    Int?     // en secondes pour audio/video
-  wordCount   Int?
-  status      String   @default("uploaded")  // NOUVEAU
-  
-  // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([userId])  // NOUVEAU pour optimisation
-  @@index([projectId])  // NOUVEAU pour optimisation
-  @@map("documents")
-}
-
-model Transcription {
-  id          String   @id @default(cuid())
-  content     String?  @db.Text  // Changé en optionnel et Text pour long contenu
-  segments    Json?    // NOUVEAU pour Whisper (segments avec timestamps)
-  words       Json?    // NOUVEAU pour Whisper (mots avec timestamps)
-  status      TranscriptionStatus @default(PENDING)  // Changé de PROCESSING à PENDING
-  engine      String   @default("whisper")
-  options     Json?    // NOUVEAU (options de transcription)
-  error       String?  // NOUVEAU (message d'erreur si échec)
-  
-  // Relations
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  documentId  String
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  projectId   String?
-  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  
-  // Metadata
-  language    String   @default("fr")
-  confidence  Json?    // Changé de Float? à Json? pour données détaillées
-  accuracy    Float?   // NOUVEAU (précision globale)
-  duration    Int?     // en secondes
-  wordCount   Int?
-  
-  // Timestamps
-  startedAt   DateTime?  // Changé en optionnel
-  completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([userId])  // NOUVEAU pour optimisation
-  @@index([projectId])  // NOUVEAU pour optimisation
-  @@index([documentId])  // NOUVEAU pour optimisation
-  @@index([status])  // NOUVEAU pour optimisation
-  @@map("transcriptions")
-}
-
-// NOUVEAU modèle pour les intégrations (Google Drive, Dropbox, etc.)
-model UserIntegration {
-  id              String           @id @default(cuid())
-  provider        String           // google-drive, dropbox, onedrive
-  accessToken     String           @db.Text
-  refreshToken    String?          @db.Text
-  expiresAt       DateTime?
-  metadata        Json?            // Données supplémentaires spécifiques au provider
+  // Paramètres de projet - NOUVEAU
+  settings        Json?    // Paramètres personnalisés
+  metadata        Json?    // Métadonnées diverses
+  tags            String[] // NOUVEAU pour catégorisation
   
   // Relations
   userId          String
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents       Document[]
+  transcriptions  Transcription[]
+  collaborators   ProjectCollaborator[] // NOUVEAU
+  activities      Activity[] // NOUVEAU
+  
+  // Stats - NOUVEAU
+  documentsCount  Int      @default(0)
+  totalDuration   Int      @default(0) // en secondes
+  totalSize       BigInt   @default(0) // en bytes
   
   // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  archivedAt      DateTime? // NOUVEAU
+  
+  @@index([userId])
+  @@index([status])
+  @@map("projects")
+}
+
+// NOUVEAU - Collaboration sur les projets
+model ProjectCollaborator {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        CollaboratorRole @default(VIEWER)
+  permissions Json?    // Permissions granulaires
+  
+  invitedBy   String?
+  invitedAt   DateTime @default(now())
+  acceptedAt  DateTime?
+  
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId])
+  @@map("project_collaborators")
+}
+
+model Document {
+  id              String   @id @default(cuid())
+  name            String
+  originalName    String
+  filename        String   // Nom stocké
+  path            String   // Chemin complet
+  url             String   // URL publique
+  publicId        String?  // Cloudinary/S3 ID
+  thumbnailUrl    String?  // NOUVEAU pour preview
+  
+  // Storage
+  size            BigInt   // Changé en BigInt pour gros fichiers
+  format          String
+  mimeType        String
+  type            DocumentType
+  storageType     StorageType @default(LOCAL)
+  googleDriveId   String?
+  s3Key           String?  // NOUVEAU pour AWS S3
+  
+  // Relations
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId       String?
+  project         Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  transcriptions  Transcription[]
+  versions        DocumentVersion[] // NOUVEAU
+  comments        Comment[] // NOUVEAU
+  
+  // Metadata enrichie
+  language        String?
+  duration        Int?     // en secondes
+  wordCount       Int?
+  pageCount       Int?     // NOUVEAU pour PDFs
+  status          DocumentStatus @default(UPLOADED)
+  processingError String?  // NOUVEAU
+  
+  // Partage - NOUVEAU
+  isPublic        Boolean  @default(false)
+  shareToken      String?  @unique
+  shareExpiresAt  DateTime?
+  downloadCount   Int      @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  processedAt     DateTime? // NOUVEAU
+  lastAccessedAt  DateTime? // NOUVEAU
+  
+  @@index([userId])
+  @@index([projectId])
+  @@index([status])
+  @@index([shareToken])
+  @@map("documents")
+}
+
+// NOUVEAU - Versioning des documents
+model DocumentVersion {
+  id          String   @id @default(cuid())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version     Int
+  url         String
+  size        BigInt
+  changes     String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  
+  @@index([documentId])
+  @@map("document_versions")
+}
+
+model Transcription {
+  id              String   @id @default(cuid())
+  content         String?  @db.Text
+  segments        Json?    // Segments Whisper avec timestamps
+  words           Json?    // Mots avec timestamps
+  subtitles       Json?    // NOUVEAU - Sous-titres générés
+  summary         String?  // NOUVEAU - Résumé IA
+  keywords        String[] // NOUVEAU - Mots-clés extraits
+  
+  status          TranscriptionStatus @default(PENDING)
+  engine          TranscriptionEngine @default(WHISPER)
+  model           String   @default("whisper-1") // NOUVEAU
+  options         Json?
+  error           String?
+  retryCount      Int      @default(0) // NOUVEAU
+  
+  // Relations
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId      String
+  document        Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  projectId       String?
+  project         Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  // Metadata améliorée
+  language        String   @default("fr")
+  detectedLanguage String? // NOUVEAU - Langue détectée automatiquement
+  confidence      Float?   // Score global
+  confidenceDetails Json?  // Détails par segment
+  accuracy        Float?
+  duration        Int?     // en secondes
+  wordCount       Int?
+  speakerCount    Int?     // NOUVEAU - Nombre de locuteurs détectés
+  
+  // Coûts et usage - NOUVEAU
+  cost            Float?   // Coût en crédits ou €
+  apiCalls        Int      @default(1)
+  processingTime  Int?     // en millisecondes
+  
+  // Timestamps
+  queuedAt        DateTime? // NOUVEAU
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([projectId])
+  @@index([documentId])
+  @@index([status])
+  @@index([engine])
+  @@map("transcriptions")
+}
+
+// NOUVEAU - Commentaires sur documents
+model Comment {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  parentId    String?
+  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("CommentReplies")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([documentId])
+  @@index([userId])
+  @@map("comments")
+}
+
+model UserIntegration {
+  id              String           @id @default(cuid())
+  provider        IntegrationProvider
+  accessToken     String           @db.Text
+  refreshToken    String?          @db.Text
+  expiresAt       DateTime?
+  scope           String[]         // NOUVEAU - Permissions accordées
+  metadata        Json?
+  isActive        Boolean          @default(true) // NOUVEAU
+  lastSyncAt      DateTime?        // NOUVEAU
+  syncError       String?          // NOUVEAU
+  
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   
   @@unique([userId, provider])
   @@index([userId])
+  @@index([provider])
   @@map("user_integrations")
 }
 
-// Enums (garder les existants)
+// NOUVEAU - Tracking d'activité
+model Activity {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  
+  action      String   // create, update, delete, share, etc.
+  entity      String   // document, transcription, project, etc.
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([projectId])
+  @@index([entity, entityId])
+  @@map("activities")
+}
+
+// NOUVEAU - Notifications
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type        NotificationType
+  title       String
+  message     String
+  data        Json?
+  
+  read        Boolean  @default(false)
+  readAt      DateTime?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+// ===== ENUMS =====
+
 enum Role {
+  SUPER_ADMIN // NOUVEAU
   ADMIN
   USER
 }
 
 enum Plan {
   FREE
-  STARTER    // NOUVEAU (pour cohérence avec le cahier des charges)
+  STARTER
   PRO
   BUSINESS
   ENTERPRISE
+  CUSTOM      // NOUVEAU
 }
 
 enum ProjectType {
@@ -175,26 +372,92 @@ enum ProjectType {
   LEGAL
   EDUCATION
   BUSINESS
+  PODCAST     // NOUVEAU
+  INTERVIEW   // NOUVEAU
+  WEBINAR     // NOUVEAU
+  MEETING     // NOUVEAU
 }
 
 enum ProjectStatus {
   ACTIVE
+  PAUSED      // NOUVEAU
   ARCHIVED
   DELETED
 }
 
 enum DocumentType {
-  DOCUMENT      // Renommé de TRANSCRIPTION
-  AUDIO         // NOUVEAU
-  VIDEO         // NOUVEAU
-  TRANSLATION   // Garder
-  ORIGINAL      // Garder
+  DOCUMENT
+  AUDIO
+  VIDEO
+  IMAGE       // NOUVEAU
+  SUBTITLE    // NOUVEAU
+  TRANSCRIPT  // NOUVEAU
+  TRANSLATION
+  ORIGINAL
+}
+
+enum DocumentStatus {
+  UPLOADED
+  PROCESSING
+  READY       // NOUVEAU
+  ERROR
+  DELETED
 }
 
 enum TranscriptionStatus {
+  QUEUED      // NOUVEAU
   PENDING
   PROCESSING
   COMPLETED
-  FAILED       // Renommé de ERROR
-  CANCELLED    // NOUVEAU
+  FAILED
+  CANCELLED
+  EXPIRED     // NOUVEAU
+}
+
+enum TranscriptionEngine {
+  WHISPER
+  GOOGLE      // NOUVEAU
+  AZURE       // NOUVEAU
+  ASSEMBLYAI  // NOUVEAU
+  CUSTOM      // NOUVEAU
+}
+
+enum StorageType {
+  LOCAL
+  CLOUDINARY
+  GOOGLE_DRIVE
+  AWS_S3      // NOUVEAU
+  AZURE_BLOB  // NOUVEAU
+  DROPBOX     // NOUVEAU
+}
+
+enum IntegrationProvider {
+  GOOGLE_DRIVE
+  DROPBOX
+  ONEDRIVE
+  BOX         // NOUVEAU
+  NOTION      // NOUVEAU
+  SLACK       // NOUVEAU
+  TEAMS       // NOUVEAU
+}
+
+enum CollaboratorRole {
+  OWNER       // NOUVEAU
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  TRANSCRIPTION_COMPLETE
+  TRANSCRIPTION_FAILED
+  COLLABORATION_INVITE
+  STORAGE_WARNING
+  QUOTA_WARNING    // NOUVEAU
+  PAYMENT_FAILED   // NOUVEAU
+  NEW_FEATURE      // NOUVEAU
 }
