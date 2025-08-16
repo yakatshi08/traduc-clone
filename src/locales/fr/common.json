@@ -1,4 +1,42 @@
 {
+  "header": {
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "analytics": "Analytiques",
+    "languages": "Langues",
+    "transcription": "Transcription",
+    "translation": "Traduction",
+    "integrations": "Intégrations",
+    "medias": "Médias",
+    "documents": "Documents",
+    "videos": "Vidéos",
+    "audios": "Audios",
+    "tools": "Outils",
+    "settings": "Paramètres",
+    "notifications": "Notifications",
+    "cloudStorage": "Stockage Cloud",
+    "collaboration": "Collaboration",
+    "aiTools": "Outils IA",
+    "theme": {
+      "light": "Mode clair",
+      "dark": "Mode sombre"
+    },
+    "user": {
+      "profile": "Profil",
+      "logout": "Déconnexion",
+      "plan": "Plan {{plan}}",
+      "preferencesLanguage": "Préférences & Langue"
+    },
+    "descriptions": {
+      "documents": "Gérez vos documents",
+      "videos": "Bibliothèque vidéo",
+      "audios": "Fichiers audio",
+      "transcription": "Transcrire audio en texte",
+      "translation": "Traduire vos contenus",
+      "mediaHub": "Gérez tous vos contenus multimédias",
+      "languageServices": "Services linguistiques avancés"
+    }
+  },
   "navigation": {
     "dashboard": "Tableau de bord",
     "projects": "Projets",
@@ -6,7 +44,7 @@
     "documents": "Documents",
     "videos": "Vidéos",
     "audios": "Audios",
-    "cloudStorage": "Cloud Storage",
+    "cloudStorage": "Stockage Cloud",
     "collaboration": "Collaboration",
     "aiTools": "Outils IA",
     "settings": "Paramètres"
@@ -15,5 +53,62 @@
   "tools": "Outils",
   "profile": {
     "plan": "Plan {{plan}}"
+  },
+  "actions": {
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "changeLanguage": "Changer la langue",
+    "toggleTheme": "Changer le thème",
+    "viewNotifications": "Voir les notifications",
+    "goToSettings": "Aller aux paramètres"
+  },
+  "status": {
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "syncing": "Synchronisation",
+    "error": "Erreur"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez votre compte et vos préférences",
+    "sections": {
+      "profile": "Profil",
+      "notifications": "Notifications",
+      "security": "Sécurité",
+      "billing": "Facturation & Plans",
+      "preferences": "Préférences",
+      "api": "API & Intégrations"
+    },
+    "language": {
+      "title": "Langue de l'interface",
+      "description": "Choisissez la langue d'affichage de l'application",
+      "select": "Sélectionner",
+      "preview": "Aperçu",
+      "currentLanguage": "Langue actuelle",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "saveSuccess": "Langue mise à jour avec succès",
+      "saveError": "Erreur lors de la sauvegarde",
+      "detectAutomatically": "Détecter automatiquement",
+      "systemDefault": "Langue du système",
+      "changeWillReload": "Le changement de langue rechargera l'interface",
+      "languageOptions": {
+        "fr": "Français",
+        "en": "Anglais",
+        "es": "Espagnol",
+        "de": "Allemand",
+        "it": "Italien"
+      }
+    },
+    "preferences": {
+      "title": "Préférences",
+      "general": "Général",
+      "appearance": "Apparence",
+      "language": "Langue",
+      "timezone": "Fuseau horaire",
+      "dateFormat": "Format de date",
+      "notifications": "Notifications",
+      "privacy": "Confidentialité"
+    }
   }
 }

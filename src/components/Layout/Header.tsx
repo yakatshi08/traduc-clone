@@ -1,5 +1,7 @@
+// project/src/components/Header.tsx
+
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
   LayoutDashboard,
@@ -7,7 +9,6 @@ import {
   BarChart3,
   FileText,
   Video,
-  Headphones,
   Cloud,
   Users,
   Sparkles,
@@ -19,9 +20,37 @@ import {
   Menu,
   X,
   ChevronDown,
-  CreditCard,
-  Languages
+  Languages,
+  Library,
+  Music,
+  Mic,
+  Globe2,
+  User,
+  LogOut,
+  ChevronRight
 } from 'lucide-react';
+
+// Composant Tooltip
+const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  return (
+    <div className="relative inline-block">
+      <div
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+      >
+        {children}
+      </div>
+      {isVisible && (
+        <div className="absolute bottom-full right-0 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded whitespace-nowrap z-50">
+          {text}
+          <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -39,27 +68,84 @@ const Header: React.FC<HeaderProps> = ({
   const { t, i18n } = useTranslation('common');
   const { theme, toggleTheme } = useTheme();
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
-  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const [showMediasDropdown, setShowMediasDropdown] = useState(false);
+  const [showLanguesDropdown, setShowLanguesDropdown] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const mediasRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
+  const languesRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const languages = [
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' }
-  ];
+  // Fermer les dropdowns quand on clique ailleurs
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mediasRef.current && !mediasRef.current.contains(event.target as Node)) {
+        setShowMediasDropdown(false);
+      }
+      if (toolsRef.current && !toolsRef.current.contains(event.target as Node)) {
+        setShowToolsDropdown(false);
+      }
+      if (languesRef.current && !languesRef.current.contains(event.target as Node)) {
+        setShowLanguesDropdown(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-    localStorage.setItem('preferredLanguage', lng);
-    setShowLanguageDropdown(false);
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toolsItems = [
     { id: 'cloud-integrations', label: 'Cloud & API', icon: Cloud },
     { id: 'collaboration', label: 'Collaboration', icon: Users },
     { id: 'ai-tools', label: 'AI Tools', icon: Sparkles }
   ];
+
+  const mediasItems = [
+    { 
+      id: 'documents', 
+      label: t('header.documents'),
+      icon: FileText,
+      description: t('header.descriptions.documents'),
+      color: 'text-blue-500 dark:text-blue-400'
+    },
+    { 
+      id: 'videos', 
+      label: t('header.videos'),
+      icon: Video,
+      description: t('header.descriptions.videos'),
+      color: 'text-purple-500 dark:text-purple-400'
+    },
+    { 
+      id: 'audios', 
+      label: t('header.audios'),
+      icon: Music,
+      description: t('header.descriptions.audios'),
+      color: 'text-green-500 dark:text-green-400'
+    }
+  ];
+
+  const languesItems = [
+    { 
+      id: 'transcription', 
+      label: t('header.transcription'),
+      icon: Mic,
+      description: t('header.descriptions.transcription'),
+      color: 'text-indigo-500 dark:text-indigo-400'
+    },
+    { 
+      id: 'translation', 
+      label: t('header.translation'),
+      icon: Globe2,
+      description: t('header.descriptions.translation'),
+      color: 'text-cyan-500 dark:text-cyan-400'
+    }
+  ];
+
+  const isMediaActive = mediasItems.some(item => item.id === activeTab);
+  const isLanguesActive = languesItems.some(item => item.id === activeTab);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 beige:bg-traduc-beige-100 border-b border-traduc-beige-300 dark:border-gray-800 transition-colors duration-300">
@@ -69,6 +155,7 @@ const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onMenuClick}
             className="p-2 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors lg:hidden"
+            aria-label={isMenuOpen ? t('actions.closeMenu') : t('actions.openMenu')}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -88,7 +175,6 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Navigation principale */}
         <nav className="hidden lg:flex items-center gap-1">
-          {/* Boutons principaux avec taille réduite */}
           <button
             onClick={() => onTabChange('dashboard')}
             className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
@@ -98,7 +184,7 @@ const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Dashboard</span>
+            <span>{t('header.dashboard')}</span>
           </button>
 
           <button
@@ -110,7 +196,7 @@ const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <FolderOpen className="w-3.5 h-3.5" />
-            <span>Projects</span>
+            <span>{t('header.projects')}</span>
           </button>
 
           <button
@@ -122,34 +208,64 @@ const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
-            <span>Analytics</span>
+            <span>{t('header.analytics')}</span>
           </button>
 
-          {/* Bouton Transcription */}
-          <button
-            onClick={() => onTabChange('transcription')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-              activeTab === 'transcription' 
-                ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Transcription</span>
-          </button>
+          {/* Menu Langues */}
+          <div ref={languesRef} className="relative">
+            <button
+              onClick={() => setShowLanguesDropdown(!showLanguesDropdown)}
+              onMouseEnter={() => setShowLanguesDropdown(true)}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
+                isLanguesActive || showLanguesDropdown
+                  ? 'bg-traduc-indigo text-white' 
+                  : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+              }`}
+            >
+              <Languages className="w-3.5 h-3.5" />
+              <span>{t('header.languages')}</span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${showLanguesDropdown ? 'rotate-180' : ''}`} />
+            </button>
 
-          {/* Nouveaux boutons ajoutés */}
-          <button
-            onClick={() => onTabChange('translation')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-              activeTab === 'translation' 
-                ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Languages className="w-3.5 h-3.5" />
-            <span>Traduction</span>
-          </button>
+            {showLanguesDropdown && (
+              <div 
+                className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 rounded-lg shadow-xl border border-traduc-beige-300 dark:border-gray-700 overflow-hidden"
+                onMouseLeave={() => setShowLanguesDropdown(false)}
+              >
+                <div className="py-2">
+                  {languesItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          onTabChange(item.id);
+                          setShowLanguesDropdown(false);
+                        }}
+                        className={`w-full px-4 py-2.5 text-left flex items-start gap-3 transition-colors ${
+                          activeTab === item.id
+                            ? 'bg-traduc-beige-200 dark:bg-gray-700'
+                            : 'hover:bg-traduc-beige-200 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <div className={`p-1.5 rounded-lg bg-gray-100 dark:bg-gray-900 ${item.color}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-traduc-beige-900 dark:text-white text-sm">
+                            {item.label}
+                          </div>
+                          <div className="text-xs text-traduc-beige-600 dark:text-gray-400 mt-0.5">
+                            {item.description}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
           <button
             onClick={() => onTabChange('integrations')}
@@ -160,54 +276,71 @@ const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Cloud className="w-3.5 h-3.5" />
-            <span>Intégrations</span>
+            <span>{t('header.integrations')}</span>
           </button>
 
-          {/* Séparateur plus fin */}
           <div className="h-5 w-px bg-traduc-beige-300 dark:bg-gray-700 mx-1" />
 
-          {/* Documents, Videos, Audios */}
-          <button
-            onClick={() => onTabChange('documents')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-              activeTab === 'documents' 
-                ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Documents</span>
-          </button>
+          {/* Menu Médias */}
+          <div ref={mediasRef} className="relative">
+            <button
+              onClick={() => setShowMediasDropdown(!showMediasDropdown)}
+              onMouseEnter={() => setShowMediasDropdown(true)}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
+                isMediaActive || showMediasDropdown
+                  ? 'bg-traduc-indigo text-white' 
+                  : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+              }`}
+            >
+              <Library className="w-3.5 h-3.5" />
+              <span>{t('header.medias')}</span>
+              <ChevronDown className={`w-3 h-3 transition-transform ${showMediasDropdown ? 'rotate-180' : ''}`} />
+            </button>
 
-          <button
-            onClick={() => onTabChange('videos')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-              activeTab === 'videos' 
-                ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Video className="w-3.5 h-3.5" />
-            <span>Videos</span>
-          </button>
+            {showMediasDropdown && (
+              <div 
+                className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 rounded-lg shadow-xl border border-traduc-beige-300 dark:border-gray-700 overflow-hidden"
+                onMouseLeave={() => setShowMediasDropdown(false)}
+              >
+                <div className="py-2">
+                  {mediasItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          onTabChange(item.id);
+                          setShowMediasDropdown(false);
+                        }}
+                        className={`w-full px-4 py-2.5 text-left flex items-start gap-3 transition-colors ${
+                          activeTab === item.id
+                            ? 'bg-traduc-beige-200 dark:bg-gray-700'
+                            : 'hover:bg-traduc-beige-200 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        <div className={`p-1.5 rounded-lg bg-gray-100 dark:bg-gray-900 ${item.color}`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-traduc-beige-900 dark:text-white text-sm">
+                            {item.label}
+                          </div>
+                          <div className="text-xs text-traduc-beige-600 dark:text-gray-400 mt-0.5">
+                            {item.description}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
-          <button
-            onClick={() => onTabChange('audios')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-              activeTab === 'audios' 
-                ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Headphones className="w-3.5 h-3.5" />
-            <span>Audios</span>
-          </button>
-
-          {/* Séparateur */}
           <div className="h-5 w-px bg-traduc-beige-300 dark:bg-gray-700 mx-1" />
 
-          {/* Tools Dropdown */}
-          <div className="relative">
+          {/* Tools */}
+          <div ref={toolsRef} className="relative">
             <button
               onClick={() => setShowToolsDropdown(!showToolsDropdown)}
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
@@ -218,7 +351,7 @@ const Header: React.FC<HeaderProps> = ({
                   : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
               }`}
             >
-              <span>Tools</span>
+              <span>{t('header.tools')}</span>
               <ChevronDown className={`w-3 h-3 transition-transform ${showToolsDropdown ? 'rotate-180' : ''}`} />
             </button>
 
@@ -240,204 +373,111 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             )}
           </div>
-
-          {/* Séparateur */}
-          <div className="h-5 w-px bg-traduc-beige-300 dark:bg-gray-700 mx-1" />
-
-          {/* Settings */}
-          <button
-            onClick={() => onTabChange('settings')}
-            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-              activeTab === 'settings' 
-                ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
-            }`}
-          >
-            <Settings className="w-3.5 h-3.5" />
-            <span>Settings</span>
-          </button>
         </nav>
 
         {/* Actions à droite */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors"
-            title={theme === 'dark' ? 'Mode Beige' : 'Mode Sombre'}
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          {/* Language avec plus d'espace */}
-          <div className="relative ml-3">
-            <button 
-              onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 border border-traduc-beige-300 dark:border-gray-700 text-traduc-beige-800 dark:text-gray-300 hover:text-traduc-beige-900 dark:hover:text-white hover:border-traduc-beige-400 dark:hover:border-gray-600 rounded-lg transition-all"
+          <Tooltip text={theme === 'dark' ? t('header.theme.light') : t('header.theme.dark')}>
+            <button
+              onClick={toggleTheme}
+              className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              aria-label={theme === 'dark' ? t('header.theme.light') : t('header.theme.dark')}
             >
-              <Globe className="w-4 h-4" />
-              <span className="font-medium">{i18n.language.toUpperCase()}</span>
-              <ChevronDown className={`w-3 h-3 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            
-            {showLanguageDropdown && (
-              <div className="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 rounded-lg shadow-lg border border-traduc-beige-300 dark:border-gray-700 py-2">
-                {languages.map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => changeLanguage(lang.code)}
-                    className={`w-full px-4 py-2 text-left flex items-center gap-3 transition-colors ${
-                      i18n.language === lang.code 
-                        ? 'bg-traduc-beige-200 dark:bg-gray-700 text-traduc-beige-900 dark:text-white' 
-                        : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <span>{lang.flag}</span>
-                    <span>{lang.name}</span>
-                  </button>
-                ))}
+          </Tooltip>
+
+          {/* Notifications */}
+          <Tooltip text={t('header.notifications')}>
+            <button 
+              className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors relative focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              aria-label={t('header.notifications')}
+            >
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+            </button>
+          </Tooltip>
+
+          {/* Settings */}
+          <Tooltip text={t('header.settings')}>
+            <button 
+              onClick={() => onTabChange('settings')}
+              className={`p-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
+                activeTab === 'settings'
+                  ? 'bg-traduc-indigo text-white'
+                  : 'text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+              }`}
+              aria-label={t('header.settings')}
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          </Tooltip>
+
+          {/* User Profile avec menu dropdown */}
+          <div ref={userMenuRef} className="relative ml-3 pl-3 border-l border-traduc-beige-300 dark:border-gray-700">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center gap-2 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 px-2 py-1 rounded-lg transition-colors"
+            >
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-medium text-traduc-beige-900 dark:text-white beige:text-traduc-beige-900">John Doe</p>
+                <p className="text-xs text-traduc-beige-600 dark:text-gray-400 beige:text-traduc-beige-600">Pro Plan</p>
+              </div>
+              <div className="w-8 h-8 bg-traduc-indigo rounded-full flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">JD</span>
+              </div>
+              <ChevronDown className={`w-3 h-3 text-traduc-beige-600 dark:text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Menu utilisateur dropdown */}
+            {showUserMenu && (
+              <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 rounded-lg shadow-lg border border-traduc-beige-300 dark:border-gray-700 py-2">
+                <div className="px-4 py-2 border-b border-traduc-beige-200 dark:border-gray-700">
+                  <p className="text-sm font-medium text-traduc-beige-900 dark:text-white">John Doe</p>
+                  <p className="text-xs text-traduc-beige-600 dark:text-gray-400">demo@traduckxion.com</p>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    onTabChange('profile');
+                    setShowUserMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left flex items-center gap-3 text-traduc-beige-900 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-700 transition-colors text-sm"
+                >
+                  <User className="w-4 h-4" />
+                  {t('header.user.profile')}
+                </button>
+
+                <button
+                  onClick={() => {
+                    onTabChange('settings/preferences');
+                    setShowUserMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left flex items-center gap-3 text-traduc-beige-900 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-700 transition-colors text-sm"
+                >
+                  <Globe className="w-4 h-4" />
+                  {t('header.user.preferencesLanguage')}
+                  <ChevronRight className="w-3 h-3 ml-auto" />
+                </button>
+
+                <div className="h-px bg-traduc-beige-200 dark:bg-gray-700 my-2" />
+
+                <button
+                  onClick={() => {
+                    // Logique de déconnexion
+                    console.log('Logout');
+                  }}
+                  className="w-full px-4 py-2 text-left flex items-center gap-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  {t('header.user.logout')}
+                </button>
               </div>
             )}
           </div>
-
-          {/* Notifications */}
-          <button className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors relative ml-2">
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-          </button>
-
-          {/* Settings icon */}
-          <button 
-            onClick={() => onTabChange('settings')}
-            className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {/* User Profile */}
-          <div className="flex items-center gap-2 ml-3 pl-3 border-l border-traduc-beige-300 dark:border-gray-700">
-            <div className="text-right hidden sm:block">
-              <p className="text-xs font-medium text-traduc-beige-900 dark:text-white beige:text-traduc-beige-900">John Doe</p>
-              <p className="text-xs text-traduc-beige-600 dark:text-gray-400 beige:text-traduc-beige-600">Pro Plan</p>
-            </div>
-            <div className="w-8 h-8 bg-traduc-indigo rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">JD</span>
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* Menu Mobile */}
-      {isMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-900 beige:bg-traduc-beige-100 border-t border-traduc-beige-300 dark:border-gray-800 px-4 py-4">
-          <nav className="space-y-1">
-            <button
-              onClick={() => { onTabChange('dashboard'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              Dashboard
-            </button>
-
-            <button
-              onClick={() => { onTabChange('projects'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <FolderOpen className="w-5 h-5" />
-              Projects
-            </button>
-
-            <button
-              onClick={() => { onTabChange('analytics'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <BarChart3 className="w-5 h-5" />
-              Analytics
-            </button>
-
-            {/* Bouton Transcription pour mobile */}
-            <button
-              onClick={() => { onTabChange('transcription'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <Sparkles className="w-5 h-5" />
-              Transcription
-            </button>
-
-            {/* Nouveaux boutons pour mobile */}
-            <button
-              onClick={() => { onTabChange('translation'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <Languages className="w-5 h-5" />
-              Traduction
-            </button>
-
-            <button
-              onClick={() => { onTabChange('integrations'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <Cloud className="w-5 h-5" />
-              Intégrations
-            </button>
-
-            <div className="h-px bg-traduc-beige-300 dark:bg-gray-700 my-2" />
-
-            <button
-              onClick={() => { onTabChange('documents'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <FileText className="w-5 h-5" />
-              Documents
-            </button>
-
-            <button
-              onClick={() => { onTabChange('videos'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <Video className="w-5 h-5" />
-              Videos
-            </button>
-
-            <button
-              onClick={() => { onTabChange('audios'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <Headphones className="w-5 h-5" />
-              Audios
-            </button>
-
-            <div className="h-px bg-traduc-beige-300 dark:bg-gray-700 my-2" />
-
-            {/* Tools section in mobile */}
-            <div className="space-y-1">
-              <p className="px-3 py-1 text-xs font-semibold text-traduc-beige-600 dark:text-gray-500 uppercase">
-                Tools
-              </p>
-              {toolsItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => { onTabChange(item.id); onMenuClick(); }}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="h-px bg-traduc-beige-300 dark:bg-gray-700 my-2" />
-
-            <button
-              onClick={() => { onTabChange('settings'); onMenuClick(); }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
-            >
-              <Settings className="w-5 h-5" />
-              Settings
-            </button>
-          </nav>
-        </div>
-      )}
     </header>
   );
 };
