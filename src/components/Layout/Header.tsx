@@ -19,7 +19,8 @@ import {
   Menu,
   X,
   ChevronDown,
-  CreditCard
+  CreditCard,
+  Languages
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -62,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 beige:bg-traduc-beige-100 border-b border-traduc-beige-300 dark:border-gray-800 transition-colors duration-300">
-      <div className="flex items-center justify-between h-极16 px-6">
+      <div className="flex items-center justify-between h-16 px-6">
         {/* Logo */}
         <div className="flex items-center gap-4">
           <button
@@ -102,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onTabChange('projects')}
-            className={`极flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
+            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
               activeTab === 'projects' 
                 ? 'bg-traduc-indigo text-white' 
                 : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
@@ -135,6 +136,31 @@ const Header: React.FC<HeaderProps> = ({
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Transcription</span>
+          </button>
+
+          {/* Nouveaux boutons ajoutés */}
+          <button
+            onClick={() => onTabChange('translation')}
+            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
+              activeTab === 'translation' 
+                ? 'bg-traduc-indigo text-white' 
+                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+            }`}
+          >
+            <Languages className="w-3.5 h-3.5" />
+            <span>Traduction</span>
+          </button>
+
+          <button
+            onClick={() => onTabChange('integrations')}
+            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
+              activeTab === 'integrations' 
+                ? 'bg-traduc-indigo text-white' 
+                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+            }`}
+          >
+            <Cloud className="w-3.5 h-3.5" />
+            <span>Intégrations</span>
           </button>
 
           {/* Séparateur plus fin */}
@@ -336,6 +362,23 @@ const Header: React.FC<HeaderProps> = ({
             >
               <Sparkles className="w-5 h-5" />
               Transcription
+            </button>
+
+            {/* Nouveaux boutons pour mobile */}
+            <button
+              onClick={() => { onTabChange('translation'); onMenuClick(); }}
+              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
+            >
+              <Languages className="w-5 h-5" />
+              Traduction
+            </button>
+
+            <button
+              onClick={() => { onTabChange('integrations'); onMenuClick(); }}
+              className="w-full flex items-center gap-3 px-3 py-2 text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg"
+            >
+              <Cloud className="w-5 h-5" />
+              Intégrations
             </button>
 
             <div className="h-px bg-traduc-beige-300 dark:bg-gray-700 my-2" />

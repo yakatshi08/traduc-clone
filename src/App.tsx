@@ -12,9 +12,12 @@ import LoginPageV2 from "./components/Auth/LoginPageV2";
 import PricingPage from "./pages/PricingPage";
 import SettingsPage from "./pages/SettingsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import DocumentsPage from "./pages/DocumentsPage"; // Nouvel import
-import VideosPage from "./pages/VideosPage"; // Nouvel import
-import AudiosPage from "./pages/AudiosPage"; // Nouvel import
+import DocumentsPage from "./pages/DocumentsPage";
+import VideosPage from "./pages/VideosPage";
+import AudiosPage from "./pages/AudiosPage";
+// Nouveaux imports ajoutés
+import TranslationPage from './pages/TranslationPage';
+import IntegrationsPage from './pages/IntegrationsPage';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -63,7 +66,7 @@ function App() {
   // Écran de chargement
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h极-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-traduc-violet to-traduc-indigo rounded-xl flex items-center justify-center shadow-2xl mb-4 mx-auto animate-pulse">
             <span className="text-white font-bold text-2xl">TX</span>
@@ -109,13 +112,20 @@ function App() {
         return <PricingPage />;
         
       case 'documents':
-        return <DocumentsPage />; // Nouvelle page
+        return <DocumentsPage />;
         
       case 'videos':
-        return <VideosPage />; // Nouvelle page
+        return <VideosPage />;
         
       case 'audios':
-        return <AudiosPage />; // Nouvelle page
+        return <AudiosPage />;
+        
+      // Nouveaux cas ajoutés
+      case 'translation':
+        return <TranslationPage />;
+        
+      case 'integrations':
+        return <IntegrationsPage />;
         
       case 'collaboration':
         return (
