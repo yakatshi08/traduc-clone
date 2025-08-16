@@ -1,3 +1,5 @@
+// project/src/pages/TranscriptionPage.tsx
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Mic,
@@ -82,7 +84,8 @@ import {
   WifiOff,
   Battery,
   BatteryLow,
-  Cpu
+  Cpu,
+  Plus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -334,7 +337,7 @@ const RichTextEditor: React.FC<{
 
       {/* Selection toolbar */}
       {selection && !readOnly && (
-        <div className="absolute bg-gray-900 rounded-lg shadow-lg p-2 flex items-center gap-2">
+        <div className="absolute bg-gray-900 rounded-lg shadow-lg p-2 flex items-center gap-2 z-10">
           <button
             onClick={() => {
               navigator.clipboard.writeText(selection);
@@ -348,8 +351,7 @@ const RichTextEditor: React.FC<{
           </button>
           <button
             onClick={() => {
-              // Rechercher dans le glossaire
-              toast.info(`Recherche de "${selection}"`);
+              toast(`Recherche de "${selection}"`, { icon: '🔍' });
               setSelection('');
             }}
             className="p-1 hover:bg-gray-800 rounded"
@@ -359,7 +361,6 @@ const RichTextEditor: React.FC<{
           </button>
           <button
             onClick={() => {
-              // Ajouter au glossaire
               toast.success(`"${selection}" ajouté au glossaire`);
               setSelection('');
             }}
@@ -465,6 +466,7 @@ const SegmentTimeline: React.FC<{
 
 // Composant Principal TranscriptionPage
 const TranscriptionPage: React.FC = () => {
+  // États
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [currentProject, setCurrentProject] = useState<TranscriptionProject | null>(null);
@@ -489,6 +491,7 @@ const TranscriptionPage: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const languages = [
     { code: 'fr', name: 'Français', flag: '🇫🇷' },
@@ -499,17 +502,15 @@ const TranscriptionPage: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Auto-save
     if (autoSave && currentProject) {
       const interval = setInterval(() => {
         saveProject();
-      }, 30000); // Save every 30 seconds
+      }, 30000);
       return () => clearInterval(interval);
     }
   }, [autoSave, currentProject, transcriptionText]);
 
   useEffect(() => {
-    // Charger un projet de démonstration
     loadDemoProject();
   }, []);
 
@@ -517,7 +518,7 @@ const TranscriptionPage: React.FC = () => {
     const demoProject: TranscriptionProject = {
       id: 'demo_1',
       name: 'Interview_Medical_Demo.mp3',
-      audioUrl: '#',
+      audioUrl: undefined, // CORRECTION: Changé de '#' à undefined
       language: 'fr',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -580,7 +581,6 @@ const TranscriptionPage: React.FC = () => {
     setConfidence(demoProject.accuracy || 0);
     setWer(demoProject.wer || 0);
     
-    // Générer le texte complet
     const fullText = demoProject.segments
       .map(seg => `<p data-segment="${seg.id}"><strong>${
         demoProject.speakers.find(s => s.id === seg.speaker)?.name || 'Unknown'
@@ -635,11 +635,11 @@ const TranscriptionPage: React.FC = () => {
       if (isPaused) {
         mediaRecorderRef.current.resume();
         setIsPaused(false);
-        toast.info('Enregistrement repris');
+        toast('Enregistrement repris', { icon: '▶️' });
       } else {
         mediaRecorderRef.current.pause();
         setIsPaused(true);
-        toast.info('Enregistrement en pause');
+        toast('Enregistrement en pause', { icon: '⏸️' });
       }
     }
   };
@@ -647,7 +647,6 @@ const TranscriptionPage: React.FC = () => {
   const processAudioBlob = async (blob: Blob) => {
     setIsProcessing(true);
     
-    // Simuler le traitement
     setTimeout(() => {
       const newSegments: TranscriptionSegment[] = [
         {
@@ -665,14 +664,137 @@ const TranscriptionPage: React.FC = () => {
     }, 3000);
   };
 
+  // NOUVELLE FONCTION : Upload de fichier audio
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['audio/mp3', 'audio/wav', 'audio/webm', 'audio/ogg', 'audio/mpeg'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Format non supporté. Utilisez MP3, WAV, WEBM ou OGG.');
+      return;
+    }
+
+    const audioUrl = URL.createObjectURL(file);
+    
+    const newProject: TranscriptionProject = {
+      id: `project_${Date.now()}`,
+      name: file.name,
+      audioUrl: audioUrl,
+      language: selectedLanguage,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      duration: 0,
+      status: 'idle',
+      segments: [],
+      speakers: [],
+      tags: [],
+      starred: false,
+      autoSave: true,
+      collaborators: []
+    };
+
+    setCurrentProject(newProject);
+    setSegments([]);
+    setTranscriptionText('');
+    
+    if (audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.onloadedmetadata = () => {
+        setDuration(audioRef.current?.duration || 0);
+        toast.success(`Fichier "${file.name}" chargé avec succès`);
+      };
+    }
+  };
+
+  // NOUVELLE FONCTION : Basculer favoris
+  const toggleStar = () => {
+    if (!currentProject) return;
+    
+    const updatedProject = {
+      ...currentProject,
+      starred: !currentProject.starred
+    };
+    
+    setCurrentProject(updatedProject);
+    
+    if (updatedProject.starred) {
+      toast.success('Ajouté aux favoris');
+    } else {
+      toast('Retiré des favoris', { icon: '⭐' });
+    }
+  };
+
+  // NOUVELLE FONCTION : Traiter avec l'IA
+  const processWithAI = async () => {
+    if (!currentProject?.audioUrl) {
+      toast.error('Aucun fichier audio chargé');
+      return;
+    }
+
+    setIsProcessing(true);
+    toast('Transcription en cours...', { icon: '🔄' });
+    
+    setTimeout(() => {
+      const demoSegments: TranscriptionSegment[] = [
+        {
+          id: `seg_${Date.now()}_1`,
+          start: 0,
+          end: 8,
+          text: 'Transcription automatique générée par l\'IA.',
+          speaker: 'speaker_1',
+          confidence: 0.96
+        },
+        {
+          id: `seg_${Date.now()}_2`,
+          start: 8,
+          end: 15,
+          text: 'Le système analyse l\'audio et identifie les locuteurs.',
+          speaker: 'speaker_2',
+          confidence: 0.94
+        }
+      ];
+      
+      const newSpeakers: Speaker[] = [
+        {
+          id: 'speaker_1',
+          name: 'Locuteur 1',
+          color: '#6366f1',
+          segments: 1,
+          totalDuration: 8
+        },
+        {
+          id: 'speaker_2',
+          name: 'Locuteur 2',
+          color: '#8b5cf6',
+          segments: 1,
+          totalDuration: 7
+        }
+      ];
+
+      if (currentProject) {
+        setCurrentProject({
+          ...currentProject,
+          speakers: newSpeakers,
+          status: 'completed'
+        });
+      }
+      
+      setSegments(demoSegments);
+      updateFullText();
+      setConfidence(95);
+      setWer(5);
+      setIsProcessing(false);
+      toast.success('Transcription terminée avec succès !');
+    }, 4000);
+  };
+
   const handleSegmentEdit = (segmentId: string, newText: string) => {
     setSegments(segments.map(seg => 
       seg.id === segmentId 
         ? { ...seg, text: newText, isEdited: true, originalText: seg.originalText || seg.text }
         : seg
     ));
-    
-    // Mettre à jour le texte complet
     updateFullText();
   };
 
@@ -691,9 +813,13 @@ const TranscriptionPage: React.FC = () => {
   };
 
   const generateAiCorrections = () => {
+    if (segments.length === 0) {
+      toast.error('Aucun segment à analyser');
+      return;
+    }
+
     setIsProcessing(true);
     
-    // Simuler la génération de corrections IA
     setTimeout(() => {
       const corrections: AICorrection[] = [
         {
@@ -726,12 +852,16 @@ const TranscriptionPage: React.FC = () => {
       updatedAt: new Date()
     };
     
-    // Sauvegarder dans localStorage ou API
     localStorage.setItem(`transcription_${currentProject.id}`, JSON.stringify(projectToSave));
     toast.success('Projet sauvegardé');
   };
 
   const exportTranscription = (format: 'txt' | 'docx' | 'srt' | 'json') => {
+    if (segments.length === 0) {
+      toast.error('Aucun contenu à exporter');
+      return;
+    }
+
     let content = '';
     let mimeType = '';
     let fileName = `${currentProject?.name || 'transcription'}.${format}`;
@@ -786,95 +916,299 @@ const TranscriptionPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-              Éditeur de Transcription IA
-            </h1>
-            {currentProject && (
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <FileText className="w-4 h-4" />
-                <span>{currentProject.name}</span>
-                {currentProject.starred && <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
+    <div className="h-screen flex flex-col bg-gray-950">
+      {/* Header réorganisé sur 2 lignes */}
+      <div className="bg-gray-900 border-b border-gray-800">
+        {/* Ligne 1 : Titre + Infos + Métriques */}
+        <div className="px-4 py-2 border-b border-gray-800">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {/* Titre compact */}
+              <h1 className="text-xs font-semibold text-gray-300 flex items-center gap-2">
+                <FileAudio className="w-4 h-4 text-violet-400" />
+                Éditeur de Transcription IA
+              </h1>
+              
+              {/* Infos projet AVEC BOUTON ÉTOILE */}
+              {currentProject && (
+                <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <span className="px-2 py-1 bg-gray-800 rounded">
+                    {currentProject.name}
+                  </span>
+                  <button
+                    onClick={toggleStar}
+                    className="p-1 hover:bg-gray-800 rounded transition-colors"
+                    title={currentProject.starred ? "Retirer des favoris" : "Ajouter aux favoris"}
+                  >
+                    {currentProject.starred ? (
+                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                    ) : (
+                      <StarOff className="w-3 h-3 text-gray-400 hover:text-yellow-500" />
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Métriques temps réel */}
+            <div className="flex items-center gap-4">
+              {/* Status */}
+              <div className="flex items-center gap-2">
+                {isRecording && (
+                  <div className="flex items-center gap-2 px-2 py-1 bg-red-500/20 rounded">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    <span className="text-xs text-red-400">
+                      {isPaused ? 'En pause' : 'Enregistrement'}
+                    </span>
+                  </div>
+                )}
+                {isProcessing && (
+                  <div className="flex items-center gap-2 px-2 py-1 bg-violet-500/20 rounded">
+                    <Loader2 className="w-3 h-3 animate-spin text-violet-400" />
+                    <span className="text-xs text-violet-400">Traitement IA</span>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Métriques */}
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <Target className="w-3 h-3 text-emerald-400" />
+                  <span className="text-gray-400">Précision:</span>
+                  <span className="font-medium text-emerald-400">{confidence.toFixed(1)}%</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-violet-400" />
+                  <span className="text-gray-400">WER:</span>
+                  <span className="font-medium text-violet-400">{wer.toFixed(1)}%</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-blue-400" />
+                  <span className="text-gray-400">Durée:</span>
+                  <span className="font-medium text-blue-400">
+                    {Math.floor(duration / 60)}:{(duration % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div className="flex items-center gap-3">
-            {/* Language selector */}
-            <select
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-            >
-              {languages.map(lang => (
-                <option key={lang.code} value={lang.code}>
-                  {lang.flag} {lang.name}
-                </option>
-              ))}
-            </select>
-            
-            {/* Template selector */}
-            <select
-              onChange={(e) => handleTemplateChange(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-              defaultValue=""
-            >
-              <option value="">Choisir un template</option>
-              {sectorTemplates.map(template => (
-                <option key={template.id} value={template.id}>
-                  {template.name}
-                </option>
-              ))}
-            </select>
-            
-            {/* Auto-save toggle */}
-            <button
-              onClick={() => setAutoSave(!autoSave)}
-              className={`p-2 rounded-lg transition-colors ${
-                autoSave ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400'
-              }`}
-              title={autoSave ? 'Sauvegarde auto activée' : 'Sauvegarde auto désactivée'}
-            >
-              {autoSave ? <Cloud className="w-4 h-4" /> : <CloudOff className="w-4 h-4" />}
-            </button>
-            
-            {/* Save button */}
-            <button
-              onClick={saveProject}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center gap-2"
-            >
-              <Save className="w-4 h-4" />
-              Sauvegarder
-            </button>
-            
-            {/* Export menu */}
-            <div className="relative group">
-              <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Exporter
+        </div>
+
+        {/* Ligne 2 : Contrôles et Actions */}
+        <div className="px-4 py-2">
+          <div className="flex items-center justify-between">
+            {/* Contrôles gauche */}
+            <div className="flex items-center gap-2">
+              {/* Contrôles d'enregistrement */}
+              <div className="flex items-center gap-1 border-r border-gray-700 pr-2">
+                {!isRecording ? (
+                  <button
+                    onClick={startRecording}
+                    className="p-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+                    title="Démarrer l'enregistrement"
+                  >
+                    <Mic className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={pauseRecording}
+                      className="p-2 bg-amber-600 hover:bg-amber-700 rounded transition-colors"
+                      title={isPaused ? 'Reprendre' : 'Pause'}
+                    >
+                      {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={stopRecording}
+                      className="p-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                      title="Arrêter"
+                    >
+                      <Square className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Upload audio CORRIGÉ */}
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded transition-colors"
+                  title="Importer un fichier audio"
+                >
+                  <Upload className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Language selector */}
+              <select
+                value={selectedLanguage}
+                onChange={(e) => {
+                  setSelectedLanguage(e.target.value);
+                  const lang = languages.find(l => l.code === e.target.value);
+                  toast.success(`Langue: ${lang?.name}`);
+                }}
+                className="bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs"
+              >
+                {languages.map(lang => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.flag} {lang.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Template selector */}
+              <select
+                onChange={(e) => handleTemplateChange(e.target.value)}
+                className="bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs"
+                defaultValue=""
+              >
+                <option value="">Template sectoriel</option>
+                {sectorTemplates.map(template => (
+                  <option key={template.id} value={template.id}>
+                    {template.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Edit mode CORRIGÉ */}
+              <div className="flex items-center bg-gray-800 rounded overflow-hidden">
+                <button
+                  onClick={() => {
+                    setEditMode('manual');
+                    toast('Mode édition manuelle', { icon: '✏️' });
+                  }}
+                  className={`px-3 py-1.5 text-xs transition-colors ${
+                    editMode === 'manual' 
+                      ? 'bg-violet-600 text-white' 
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Manuel
+                </button>
+                <button
+                  onClick={() => {
+                    setEditMode('auto');
+                    toast('Mode correction IA', { icon: '🤖' });
+                    if (segments.length > 0) {
+                      generateAiCorrections();
+                    }
+                  }}
+                  className={`px-3 py-1.5 text-xs transition-colors ${
+                    editMode === 'auto' 
+                      ? 'bg-violet-600 text-white' 
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Auto IA
+                </button>
+              </div>
+
+              {/* Process with AI button */}
+              {currentProject?.audioUrl && segments.length === 0 && (
+                <button
+                  onClick={processWithAI}
+                  disabled={isProcessing}
+                  className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-xs flex items-center gap-1 disabled:opacity-50"
+                >
+                  <Wand2 className="w-4 h-4" />
+                  Transcrire
+                </button>
+              )}
+            </div>
+
+            {/* Actions droite */}
+            <div className="flex items-center gap-2">
+              {/* Auto-save toggle */}
+              <button
+                onClick={() => {
+                  setAutoSave(!autoSave);
+                  toast(autoSave ? 'Sauvegarde auto désactivée' : 'Sauvegarde auto activée', { 
+                    icon: autoSave ? '💾❌' : '💾✅' 
+                  });
+                }}
+                className={`p-2 rounded transition-colors ${
+                  autoSave ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-gray-400'
+                }`}
+                title={autoSave ? 'Sauvegarde auto activée' : 'Sauvegarde auto désactivée'}
+              >
+                {autoSave ? <Cloud className="w-4 h-4" /> : <CloudOff className="w-4 h-4" />}
               </button>
-              <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+
+              {/* Generate AI */}
+              <button
+                onClick={generateAiCorrections}
+                disabled={isProcessing || segments.length === 0}
+                className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded text-xs flex items-center gap-1 disabled:opacity-50"
+              >
+                <Brain className="w-4 h-4" />
+                Analyser
+              </button>
+
+              {/* Save */}
+              <button
+                onClick={saveProject}
+                disabled={!currentProject}
+                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs flex items-center gap-1 disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                Sauvegarder
+              </button>
+
+              {/* Export dropdown */}
+              <div className="relative group">
+                <button className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded text-xs flex items-center gap-1">
+                  <Download className="w-4 h-4" />
+                  Exporter
+                </button>
+                <div className="absolute right-0 mt-1 w-40 bg-gray-800 rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                  <button
+                    onClick={() => exportTranscription('txt')}
+                    className="w-full px-3 py-2 text-xs text-left hover:bg-gray-700"
+                  >
+                    Texte (.txt)
+                  </button>
+                  <button
+                    onClick={() => exportTranscription('srt')}
+                    className="w-full px-3 py-2 text-xs text-left hover:bg-gray-700"
+                  >
+                    Sous-titres (.srt)
+                  </button>
+                  <button
+                    onClick={() => exportTranscription('json')}
+                    className="w-full px-3 py-2 text-xs text-left hover:bg-gray-700"
+                  >
+                    JSON (.json)
+                  </button>
+                </div>
+              </div>
+
+              {/* View toggles */}
+              <div className="flex items-center gap-1 border-l border-gray-700 pl-2">
                 <button
-                  onClick={() => exportTranscription('txt')}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-700 rounded-t-lg"
+                  onClick={() => setShowTimeline(!showTimeline)}
+                  className={`p-2 rounded transition-colors ${
+                    showTimeline ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400'
+                  }`}
+                  title="Timeline"
                 >
-                  Texte (.txt)
+                  <History className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => exportTranscription('srt')}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-700"
+                  onClick={() => setShowAiPanel(!showAiPanel)}
+                  className={`p-2 rounded transition-colors ${
+                    showAiPanel ? 'bg-gray-700 text-white' : 'bg-gray-800 text-gray-400'
+                  }`}
+                  title="Assistant IA"
                 >
-                  Sous-titres (.srt)
-                </button>
-                <button
-                  onClick={() => exportTranscription('json')}
-                  className="w-full px-4 py-2 text-left hover:bg-gray-700 rounded-b-lg"
-                >
-                  JSON (.json)
+                  <Brain className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -884,66 +1218,73 @@ const TranscriptionPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Recording Controls & Timeline */}
+        {/* Left Panel */}
         <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
-          {/* Recording Controls */}
-          <div className="p-4 border-b border-gray-800">
-            <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-              <Mic className="w-4 h-4 text-indigo-400" />
-              Contrôles d'enregistrement
-            </h3>
-            
-            <div className="flex items-center justify-center gap-3 mb-4">
-              {!isRecording ? (
+          {/* Audio Player CORRIGÉ avec vérification */}
+          {currentProject?.audioUrl && currentProject.audioUrl !== '#' && (
+            <div className="p-4 border-b border-gray-800">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Headphones className="w-4 h-4 text-indigo-400" />
+                Lecteur audio
+              </h3>
+              <audio
+                ref={audioRef}
+                src={currentProject.audioUrl}
+                controls
+                className="w-full"
+                onTimeUpdate={(e) => {
+                  setCurrentTime(e.currentTarget.currentTime);
+                }}
+                onLoadedMetadata={(e) => {
+                  setDuration(e.currentTarget.duration);
+                }}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+              />
+              
+              {/* Boutons de contrôle audio */}
+              <div className="flex items-center gap-2 mt-3">
                 <button
-                  onClick={startRecording}
-                  className="p-4 bg-red-600 hover:bg-red-700 rounded-full transition-colors"
+                  onClick={() => {
+                    if (audioRef.current) {
+                      audioRef.current.currentTime = Math.max(0, currentTime - 5);
+                    }
+                  }}
+                  className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs"
+                  title="Reculer 5s"
                 >
-                  <Mic className="w-6 h-6" />
+                  -5s
                 </button>
-              ) : (
-                <>
-                  <button
-                    onClick={pauseRecording}
-                    className="p-3 bg-amber-600 hover:bg-amber-700 rounded-full transition-colors"
-                  >
-                    {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-                  </button>
-                  <button
-                    onClick={stopRecording}
-                    className="p-3 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors"
-                  >
-                    <Square className="w-5 h-5" />
-                  </button>
-                </>
-              )}
+                <button
+                  onClick={() => {
+                    if (audioRef.current) {
+                      if (audioRef.current.paused) {
+                        audioRef.current.play();
+                      } else {
+                        audioRef.current.pause();
+                      }
+                    }
+                  }}
+                  className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 rounded text-xs flex-1"
+                >
+                  {isPlaying ? 'Pause' : 'Play'}
+                </button>
+                <button
+                  onClick={() => {
+                    if (audioRef.current) {
+                      audioRef.current.currentTime = Math.min(duration, currentTime + 5);
+                    }
+                  }}
+                  className="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs"
+                  title="Avancer 5s"
+                >
+                  +5s
+                </button>
+              </div>
             </div>
-            
-            {isRecording && (
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-2 text-red-500">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="text-sm">
-                    {isPaused ? 'En pause' : 'Enregistrement...'}
-                  </span>
-                </div>
-              </div>
-            )}
-            
-            {/* Audio player */}
-            {currentProject?.audioUrl && (
-              <div className="mt-4">
-                <audio
-                  ref={audioRef}
-                  src={currentProject.audioUrl}
-                  controls
-                  className="w-full"
-                />
-              </div>
-            )}
-          </div>
+          )}
 
-          {/* Timeline */}
+          {/* Timeline et Segments */}
           {showTimeline && currentProject && (
             <div className="flex-1 p-4 overflow-y-auto">
               <SegmentTimeline
@@ -959,6 +1300,9 @@ const TranscriptionPage: React.FC = () => {
                 onSegmentClick={(segment) => {
                   setSelectedSegment(segment);
                   setCurrentTime(segment.start);
+                  if (audioRef.current) {
+                    audioRef.current.currentTime = segment.start;
+                  }
                 }}
                 speakers={currentProject.speakers}
               />
@@ -972,7 +1316,12 @@ const TranscriptionPage: React.FC = () => {
                     return (
                       <div
                         key={segment.id}
-                        onClick={() => setSelectedSegment(segment)}
+                        onClick={() => {
+                          setSelectedSegment(segment);
+                          if (audioRef.current) {
+                            audioRef.current.currentTime = segment.start;
+                          }
+                        }}
                         className={`p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-all ${
                           selectedSegment?.id === segment.id ? 'ring-2 ring-indigo-500' : ''
                         }`}
@@ -1031,7 +1380,6 @@ const TranscriptionPage: React.FC = () => {
         {/* Right Panel - AI Assistant */}
         {showAiPanel && (
           <div className="w-80 bg-gray-900 border-l border-gray-800 flex flex-col">
-            {/* AI Header */}
             <div className="p-4 border-b border-gray-800">
               <h3 className="text-sm font-semibold flex items-center gap-2">
                 <Brain className="w-4 h-4 text-violet-400" />
@@ -1039,45 +1387,13 @@ const TranscriptionPage: React.FC = () => {
               </h3>
             </div>
 
-            {/* AI Metrics */}
-            <div className="p-4 border-b border-gray-800">
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">Précision</span>
-                    <span className="font-medium">{confidence.toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-800 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 rounded-full"
-                      style={{ width: `${confidence}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">WER</span>
-                    <span className="font-medium">{wer.toFixed(1)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-800 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-violet-500 to-violet-600 h-2 rounded-full"
-                      style={{ width: `${100 - wer}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* AI Corrections */}
             <div className="flex-1 p-4 overflow-y-auto">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium">Corrections suggérées</h4>
                 <button
                   onClick={generateAiCorrections}
-                  disabled={isProcessing}
-                  className="p-1 hover:bg-gray-800 rounded"
+                  disabled={isProcessing || segments.length === 0}
+                  className="p-1 hover:bg-gray-800 rounded disabled:opacity-50"
                 >
                   <RefreshCw className={`w-4 h-4 ${isProcessing ? 'animate-spin' : ''}`} />
                 </button>
@@ -1087,12 +1403,14 @@ const TranscriptionPage: React.FC = () => {
                 <div className="text-center py-8 text-gray-500">
                   <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">Aucune correction suggérée</p>
-                  <button
-                    onClick={generateAiCorrections}
-                    className="mt-3 px-3 py-1 bg-violet-600 hover:bg-violet-700 rounded text-sm"
-                  >
-                    Analyser le texte
-                  </button>
+                  {segments.length > 0 && (
+                    <button
+                      onClick={generateAiCorrections}
+                      className="mt-3 px-3 py-1 bg-violet-600 hover:bg-violet-700 rounded text-sm"
+                    >
+                      Analyser le texte
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1162,27 +1480,6 @@ const TranscriptionPage: React.FC = () => {
                     >
                       {term}
                     </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Collaborators */}
-            {collaborators.length > 0 && (
-              <div className="p-4 border-t border-gray-800">
-                <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  Collaborateurs ({collaborators.length})
-                </h4>
-                <div className="flex -space-x-2">
-                  {collaborators.map((collab, index) => (
-                    <div
-                      key={index}
-                      className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full border-2 border-gray-900 flex items-center justify-center text-white text-xs font-bold"
-                      title={collab}
-                    >
-                      {collab[0].toUpperCase()}
-                    </div>
                   ))}
                 </div>
               </div>
