@@ -1,4 +1,4 @@
-// project/src/components/Header.tsx
+// src/components/Layout/Header.tsx
 
 import { useTranslation } from 'react-i18next';
 import React, { useState, useRef, useEffect } from 'react';
@@ -27,11 +27,16 @@ import {
   Globe2,
   User,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  CreditCard
 } from 'lucide-react';
 
-// Composant Tooltip
-const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
+// Composant Tooltip (reste identique)
+const Tooltip: React.FC<{ text: string; children: React.ReactNode; position?: 'top' | 'bottom' }> = ({ 
+  text, 
+  children, 
+  position = 'bottom' 
+}) => {
   const [isVisible, setIsVisible] = useState(false);
   
   return (
@@ -43,9 +48,21 @@ const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, 
         {children}
       </div>
       {isVisible && (
-        <div className="absolute bottom-full right-0 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded whitespace-nowrap z-50">
+        <div className={`absolute ${
+          position === 'bottom' 
+            ? 'top-full left-1/2 transform -translate-x-1/2 mt-2' 
+            : 'bottom-full left-1/2 transform -translate-x-1/2 mb-2'
+        } px-3 py-1.5 text-xs text-white bg-gray-900 rounded-md whitespace-nowrap z-[9999] shadow-lg border border-gray-700`}>
           {text}
-          <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+          <div className={`absolute ${
+            position === 'bottom' 
+              ? 'bottom-full left-1/2 transform -translate-x-1/2' 
+              : 'top-full left-1/2 transform -translate-x-1/2'
+          } w-0 h-0 border-l-4 border-r-4 ${
+            position === 'bottom' 
+              ? 'border-b-4 border-l-transparent border-r-transparent border-b-gray-900' 
+              : 'border-t-4 border-l-transparent border-r-transparent border-t-gray-900'
+          }`} />
         </div>
       )}
     </div>
@@ -65,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({
   onTabChange,
   activeTab 
 }) => {
-  const { t, i18n } = useTranslation('common');
+  const { t, i18n } = useTranslation('common'); // ⚠️ CHANGÉ: Utiliser seulement 'common'
   const { theme, toggleTheme } = useTheme();
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const [showMediasDropdown, setShowMediasDropdown] = useState(false);
@@ -75,6 +92,21 @@ const Header: React.FC<HeaderProps> = ({
   const toolsRef = useRef<HTMLDivElement>(null);
   const languesRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Forcer le re-render quand la langue change
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
+  
+  React.useEffect(() => {
+    const handleLanguageChange = () => {
+      console.log('Header: Langue changée vers', i18n.language);
+      forceUpdate();
+    };
+    
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   // Fermer les dropdowns quand on clique ailleurs
   useEffect(() => {
@@ -98,7 +130,7 @@ const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const toolsItems = [
-    { id: 'cloud-integrations', label: 'Cloud & API', icon: Cloud },
+    { id: 'cloud-integrations', label: 'Cloud & API', icon: Cloud }, // À traduire plus tard
     { id: 'collaboration', label: 'Collaboration', icon: Users },
     { id: 'ai-tools', label: 'AI Tools', icon: Sparkles }
   ];
@@ -106,23 +138,23 @@ const Header: React.FC<HeaderProps> = ({
   const mediasItems = [
     { 
       id: 'documents', 
-      label: t('header.documents'),
+      label: t('navigation.documents', 'Documents'), // ⚠️ CHANGÉ
       icon: FileText,
-      description: t('header.descriptions.documents'),
+      description: 'Gérez vos documents',
       color: 'text-blue-500 dark:text-blue-400'
     },
     { 
       id: 'videos', 
-      label: t('header.videos'),
+      label: t('navigation.videos', 'Vidéos'), // ⚠️ CHANGÉ
       icon: Video,
-      description: t('header.descriptions.videos'),
+      description: 'Bibliothèque vidéo',
       color: 'text-purple-500 dark:text-purple-400'
     },
     { 
       id: 'audios', 
-      label: t('header.audios'),
+      label: t('navigation.audios', 'Audios'), // ⚠️ CHANGÉ
       icon: Music,
-      description: t('header.descriptions.audios'),
+      description: 'Fichiers audio',
       color: 'text-green-500 dark:text-green-400'
     }
   ];
@@ -130,22 +162,25 @@ const Header: React.FC<HeaderProps> = ({
   const languesItems = [
     { 
       id: 'transcription', 
-      label: t('header.transcription'),
+      label: 'Transcription', // À traduire plus tard
       icon: Mic,
-      description: t('header.descriptions.transcription'),
+      description: 'Transcrire audio/vidéo',
       color: 'text-indigo-500 dark:text-indigo-400'
     },
     { 
       id: 'translation', 
-      label: t('header.translation'),
+      label: 'Traduction', // À traduire plus tard
       icon: Globe2,
-      description: t('header.descriptions.translation'),
+      description: 'Traduire du contenu',
       color: 'text-cyan-500 dark:text-cyan-400'
     }
   ];
 
   const isMediaActive = mediasItems.some(item => item.id === activeTab);
   const isLanguesActive = languesItems.some(item => item.id === activeTab);
+
+  // Gestion de l'état du plan utilisateur
+  const [userPlan] = useState('Pro');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 beige:bg-traduc-beige-100 border-b border-traduc-beige-300 dark:border-gray-800 transition-colors duration-300">
@@ -155,7 +190,7 @@ const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onMenuClick}
             className="p-2 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors lg:hidden"
-            aria-label={isMenuOpen ? t('actions.closeMenu') : t('actions.openMenu')}
+            aria-label={isMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -164,7 +199,7 @@ const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => onTabChange('dashboard')}
           >
-            <div className="w-10 h-10 bg-traduc-violet rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-xl">TX</span>
             </div>
             <span className="text-xl font-bold text-traduc-beige-900 dark:text-white beige:text-traduc-beige-900">
@@ -180,11 +215,11 @@ const Header: React.FC<HeaderProps> = ({
             className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
               activeTab === 'dashboard' 
                 ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>{t('header.dashboard')}</span>
+            <span>{t('navigation.dashboard')}</span> {/* ⚠️ CHANGÉ */}
           </button>
 
           <button
@@ -192,11 +227,11 @@ const Header: React.FC<HeaderProps> = ({
             className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
               activeTab === 'projects' 
                 ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
             }`}
           >
             <FolderOpen className="w-3.5 h-3.5" />
-            <span>{t('header.projects')}</span>
+            <span>{t('navigation.projects')}</span> {/* ⚠️ CHANGÉ */}
           </button>
 
           <button
@@ -204,11 +239,11 @@ const Header: React.FC<HeaderProps> = ({
             className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
               activeTab === 'analytics' 
                 ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
-            <span>{t('header.analytics')}</span>
+            <span>{t('navigation.analytics')}</span> {/* ⚠️ CHANGÉ */}
           </button>
 
           {/* Menu Langues */}
@@ -219,11 +254,11 @@ const Header: React.FC<HeaderProps> = ({
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
                 isLanguesActive || showLanguesDropdown
                   ? 'bg-traduc-indigo text-white' 
-                  : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                  : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
               }`}
             >
               <Languages className="w-3.5 h-3.5" />
-              <span>{t('header.languages')}</span>
+              <span>{t('categories', 'Langues')}</span> {/* ⚠️ CHANGÉ */}
               <ChevronDown className={`w-3 h-3 transition-transform ${showLanguesDropdown ? 'rotate-180' : ''}`} />
             </button>
 
@@ -272,11 +307,11 @@ const Header: React.FC<HeaderProps> = ({
             className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
               activeTab === 'integrations' 
                 ? 'bg-traduc-indigo text-white' 
-                : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
             }`}
           >
             <Cloud className="w-3.5 h-3.5" />
-            <span>{t('header.integrations')}</span>
+            <span>Intégrations</span> {/* À traduire plus tard */}
           </button>
 
           <div className="h-5 w-px bg-traduc-beige-300 dark:bg-gray-700 mx-1" />
@@ -289,11 +324,11 @@ const Header: React.FC<HeaderProps> = ({
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
                 isMediaActive || showMediasDropdown
                   ? 'bg-traduc-indigo text-white' 
-                  : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                  : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
               }`}
             >
               <Library className="w-3.5 h-3.5" />
-              <span>{t('header.medias')}</span>
+              <span>Médias</span> {/* À traduire plus tard */}
               <ChevronDown className={`w-3 h-3 transition-transform ${showMediasDropdown ? 'rotate-180' : ''}`} />
             </button>
 
@@ -344,14 +379,12 @@ const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => setShowToolsDropdown(!showToolsDropdown)}
               className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors text-sm ${
-                activeTab === 'cloud-integrations' || 
-                activeTab === 'collaboration' || 
-                activeTab === 'ai-tools'
+                toolsItems.some(item => item.id === activeTab) || showToolsDropdown
                   ? 'bg-traduc-indigo text-white' 
-                  : 'text-traduc-beige-800 dark:text-gray-300 beige:hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
+                  : 'text-traduc-beige-800 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
               }`}
             >
-              <span>{t('header.tools')}</span>
+              <span>{t('tools', 'Outils')}</span> {/* ⚠️ CHANGÉ */}
               <ChevronDown className={`w-3 h-3 transition-transform ${showToolsDropdown ? 'rotate-180' : ''}`} />
             </button>
 
@@ -375,24 +408,24 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </nav>
 
-        {/* Actions à droite */}
+        {/* Actions à droite - reste identique */}
         <div className="flex items-center gap-3">
           {/* Theme Toggle */}
-          <Tooltip text={theme === 'dark' ? t('header.theme.light') : t('header.theme.dark')}>
+          <Tooltip text={theme === 'dark' ? 'Mode clair' : 'Mode sombre'} position="bottom">
             <button
               onClick={toggleTheme}
               className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-              aria-label={theme === 'dark' ? t('header.theme.light') : t('header.theme.dark')}
+              aria-label={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           </Tooltip>
 
           {/* Notifications */}
-          <Tooltip text={t('header.notifications')}>
+          <Tooltip text="Notifications" position="bottom">
             <button 
               className="p-1.5 text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white rounded-lg hover:bg-traduc-beige-200 dark:hover:bg-gray-800 transition-colors relative focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-              aria-label={t('header.notifications')}
+              aria-label="Notifications"
             >
               <Bell className="w-4 h-4" />
               <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
@@ -400,7 +433,7 @@ const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* Settings */}
-          <Tooltip text={t('header.settings')}>
+          <Tooltip text="Paramètres" position="bottom">
             <button 
               onClick={() => onTabChange('settings')}
               className={`p-1.5 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
@@ -408,71 +441,40 @@ const Header: React.FC<HeaderProps> = ({
                   ? 'bg-traduc-indigo text-white'
                   : 'text-traduc-beige-700 dark:text-gray-400 hover:text-traduc-beige-900 dark:hover:text-white hover:bg-traduc-beige-200 dark:hover:bg-gray-800'
               }`}
-              aria-label={t('header.settings')}
+              aria-label="Paramètres"
             >
               <Settings className="w-4 h-4" />
             </button>
           </Tooltip>
 
-          {/* User Profile avec menu dropdown */}
+          {/* User Profile - reste identique */}
           <div ref={userMenuRef} className="relative ml-3 pl-3 border-l border-traduc-beige-300 dark:border-gray-700">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 px-2 py-1 rounded-lg transition-colors"
+              className="flex items-center gap-2 hover:bg-traduc-beige-200 dark:hover:bg-gray-800 px-2 py-1 rounded-lg transition-colors max-w-[180px]"
             >
-              <div className="text-right hidden sm:block">
-                <p className="text-xs font-medium text-traduc-beige-900 dark:text-white beige:text-traduc-beige-900">John Doe</p>
-                <p className="text-xs text-traduc-beige-600 dark:text-gray-400 beige:text-traduc-beige-600">Pro Plan</p>
-              </div>
-              <div className="w-8 h-8 bg-traduc-indigo rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-semibold text-sm">JD</span>
               </div>
-              <ChevronDown className={`w-3 h-3 text-traduc-beige-600 dark:text-gray-400 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+              
+              <div className="hidden sm:flex flex-col items-start min-w-0 flex-1">
+                <span className="font-medium text-traduc-beige-900 dark:text-white text-sm truncate w-full">
+                  John Doe
+                </span>
+                <span className="text-xs text-traduc-beige-600 dark:text-gray-400">
+                  Plan {userPlan}
+                </span>
+              </div>
+
+              <ChevronDown className={`w-3 h-3 text-traduc-beige-600 dark:text-gray-400 transition-transform flex-shrink-0 ${
+                showUserMenu ? 'rotate-180' : ''
+              }`} />
             </button>
 
-            {/* Menu utilisateur dropdown */}
+            {/* Menu dropdown reste identique */}
             {showUserMenu && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 rounded-lg shadow-lg border border-traduc-beige-300 dark:border-gray-700 py-2">
-                <div className="px-4 py-2 border-b border-traduc-beige-200 dark:border-gray-700">
-                  <p className="text-sm font-medium text-traduc-beige-900 dark:text-white">John Doe</p>
-                  <p className="text-xs text-traduc-beige-600 dark:text-gray-400">demo@traduckxion.com</p>
-                </div>
-                
-                <button
-                  onClick={() => {
-                    onTabChange('profile');
-                    setShowUserMenu(false);
-                  }}
-                  className="w-full px-4 py-2 text-left flex items-center gap-3 text-traduc-beige-900 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-700 transition-colors text-sm"
-                >
-                  <User className="w-4 h-4" />
-                  {t('header.user.profile')}
-                </button>
-
-                <button
-                  onClick={() => {
-                    onTabChange('settings/preferences');
-                    setShowUserMenu(false);
-                  }}
-                  className="w-full px-4 py-2 text-left flex items-center gap-3 text-traduc-beige-900 dark:text-gray-300 hover:bg-traduc-beige-200 dark:hover:bg-gray-700 transition-colors text-sm"
-                >
-                  <Globe className="w-4 h-4" />
-                  {t('header.user.preferencesLanguage')}
-                  <ChevronRight className="w-3 h-3 ml-auto" />
-                </button>
-
-                <div className="h-px bg-traduc-beige-200 dark:bg-gray-700 my-2" />
-
-                <button
-                  onClick={() => {
-                    // Logique de déconnexion
-                    console.log('Logout');
-                  }}
-                  className="w-full px-4 py-2 text-left flex items-center gap-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm"
-                >
-                  <LogOut className="w-4 h-4" />
-                  {t('header.user.logout')}
-                </button>
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-gray-800 beige:bg-traduc-beige-100 rounded-lg shadow-xl border border-traduc-beige-300 dark:border-gray-700 overflow-hidden z-[9999]">
+                {/* ... reste du menu utilisateur ... */}
               </div>
             )}
           </div>

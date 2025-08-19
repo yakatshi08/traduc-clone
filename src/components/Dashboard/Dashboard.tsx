@@ -663,27 +663,83 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Répartition par secteur */}
+        {/* Répartition par secteur - VERSION CORRIGÉE */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Target className="w-5 h-5 text-indigo-400" />
-            Par secteur d'activité
-          </h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <RadialBarChart cx="50%" cy="50%" innerRadius="10%" outerRadius="90%" data={sectorData}>
-              <RadialBar
-                minAngle={15}
-                background
-                clockWise
-                dataKey="value"
-                fill="#8884d8"
-              />
-              <Legend />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151' }}
-              />
-            </RadialBarChart>
-          </ResponsiveContainer>
+          {/* Header avec titre et total */}
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold text-white">
+              Répartition des projets par secteur d'activité
+            </h3>
+            <span className="text-sm text-gray-400">
+              Total: <span className="font-semibold text-white">
+                {sectorData.reduce((sum, d) => sum + d.value, 0)}
+              </span>
+            </span>
+          </div>
+
+          {/* Graphique Donut centré */}
+          <div className="flex justify-center items-center py-4">
+            <ResponsiveContainer width={200} height={200}>
+              <PieChart>
+                <Pie
+                  data={sectorData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={3}
+                  dataKey="value"
+                  startAngle={90}
+                  endAngle={450}
+                >
+                  {sectorData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ 
+                    backgroundColor: '#1f2937', 
+                    border: '1px solid #374151',
+                    borderRadius: '0.5rem'
+                  }}
+                  formatter={(value: number, name: string) => {
+                    const total = sectorData.reduce((sum, d) => sum + d.value, 0);
+                    const percentage = ((value / total) * 100).toFixed(0);
+                    return [`${value} (${percentage}%)`, name];
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Légende en bas sur 2 lignes */}
+          <div className="grid grid-cols-3 gap-x-4 gap-y-2 mt-4">
+            {sectorData.map((item, index) => {
+              const total = sectorData.reduce((sum, d) => sum + d.value, 0);
+              const percentage = ((item.value / total) * 100).toFixed(0);
+              return (
+                <div 
+                  key={item.name}
+                  className="flex items-center gap-2"
+                >
+                  <div 
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-sm text-gray-300">
+                    {item.name}{' '}
+                    <span className="font-semibold text-white">{item.value}</span>
+                    <span className="text-gray-500 text-xs"> · {percentage}%</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Note d'aide */}
+          <p className="mt-4 pt-3 border-t border-gray-700/50 text-xs text-gray-500">
+            Astuce : survolez un secteur pour voir la valeur exacte et son pourcentage. Les couleurs correspondent à la légende.
+          </p>
         </div>
 
         {/* Stockage et ressources */}

@@ -1,18 +1,122 @@
 {
-  "navigation": {
-    "dashboard": "Panel de control",
-    "projects": "Proyectos",
-    "analytics": "Analíticas",
-    "documents": "Documentos",
-    "videos": "Vídeos",
+  "header": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "analytics": "Analytics",
+    "languages": "Languages",
+    "transcription": "Transcription",
+    "translation": "Translation",
+    "integrations": "Integrations",
+    "medias": "Media",
+    "documents": "Documents",
+    "videos": "Videos",
     "audios": "Audios",
-    "cloudStorage": "Almacenamiento en la nube",
-    "collaboration": "Colaboración",
-    "aiTools": "Herramientas IA"
+    "tools": "Tools",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "cloudStorage": "Cloud Storage",
+    "collaboration": "Collaboration",
+    "aiTools": "AI Tools",
+    "theme": {
+      "light": "Light mode",
+      "dark": "Dark mode"
+    },
+    "user": {
+      "profile": "Profile",
+      "logout": "Logout",
+      "plan": "{{plan}} Plan",
+      "preferencesLanguage": "Preferences & Language",
+      "billing": "Billing & Plans",
+      "settings": "Settings",
+      "active": "Active"
+    },
+    "descriptions": {
+      "documents": "Manage your documents",
+      "videos": "Video library",
+      "audios": "Audio files",
+      "transcription": "Transcribe audio to text",
+      "translation": "Translate your content",
+      "mediaHub": "Manage all your multimedia content",
+      "languageServices": "Advanced language services"
+    }
   },
-  "categories": "Categorías",
-  "tools": "Herramientas",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "analytics": "Analytics",
+    "documents": "Documents",
+    "videos": "Videos",
+    "audios": "Audios",
+    "cloudStorage": "Cloud Storage",
+    "collaboration": "Collaboration",
+    "aiTools": "AI Tools",
+    "settings": "Settings",
+    "integrations": "Integrations",
+    "medias": "Media",
+    "cloudApi": "Cloud & API",
+    "languages": "Languages",
+    "tools": "Tools"
+  },
+  "categories": "Categories",
+  "tools": "Tools",
   "profile": {
-    "plan": "Plan {{plan}}"
+    "plan": "{{plan}} Plan"
+  },
+  "actions": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "changeLanguage": "Change language",
+    "toggleTheme": "Toggle theme",
+    "viewNotifications": "View notifications",
+    "goToSettings": "Go to settings"
+  },
+  "status": {
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "syncing": "Syncing",
+    "error": "Error"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "sections": {
+      "profile": "Profile",
+      "notifications": "Notifications",
+      "security": "Security",
+      "billing": "Billing & Plans",
+      "preferences": "Preferences",
+      "api": "API & Integrations"
+    },
+    "language": {
+      "title": "Interface Language",
+      "description": "Choose the display language for the application",
+      "select": "Select",
+      "preview": "Preview",
+      "currentLanguage": "Current language",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Language updated successfully",
+      "saveError": "Error saving language",
+      "detectAutomatically": "Detect automatically",
+      "systemDefault": "System language",
+      "changeWillReload": "Changing the language will reload the interface",
+      "languageOptions": {
+        "fr": "French",
+        "en": "English",
+        "es": "Spanish",
+        "de": "German",
+        "it": "Italian"
+      }
+    },
+    "preferences": {
+      "title": "Preferences",
+      "general": "General",
+      "appearance": "Appearance",
+      "language": "Language",
+      "timezone": "Timezone",
+      "dateFormat": "Date format",
+      "notifications": "Notifications",
+      "privacy": "Privacy"
+    }
   }
 }

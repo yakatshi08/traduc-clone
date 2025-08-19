@@ -1,0 +1,98 @@
+📁 ARBORESCENCE COMPLÈTE DE TRADUCKXION
+Voici la structure complète basée sur toutes vos captures d'écran :
+
+
+C:\PROJETS-DEVELOPPEMENT\traduc-clone\
+├── 📁 .bolt/
+├── 📁 .git/
+├── 📁 backend/
+├── 📁 DOC-PROJET/
+├── 📁 frontend/
+├── 📁 node_modules/
+├── 📁 public/
+├── 📁 sdks/
+├── 📁 src/
+│   ├── 📁 components/
+│   │   ├── 📁 Auth/
+│   │   ├── 📁 Dashboard/
+│   │   │   ├── 📄 Dashboard.tsx (32 Ko)
+│   │   │   ├── 📄 ActivityChart.tsx (6 Ko)
+│   │   │   ├── 📄 ProgressChart.tsx (3 Ko)
+│   │   │   ├── 📄 QuickActions.tsx (4 Ko)
+│   │   │   ├── 📄 RecentProjects.tsx (5 Ko)
+│   │   │   └── 📄 StatsCard.tsx (1 Ko)
+│   │   ├── 📁 Layout/
+│   │   │   ├── 📄 Header.tsx (23 Ko) ✓
+│   │   │   ├── 📄 LanguageSelector.tsx (3 Ko)
+│   │   │   └── 📄 Sidebar.tsx (9 Ko)
+│   │   ├── 📁 Modals/
+│   │   │   ├── 📄 FileActionsModal.tsx (9 Ko)
+│   │   │   ├── 📄 NewProjectModal.tsx (11 Ko)
+│   │   │   ├── 📄 ReportGeneratorModal.tsx (10 Ko)
+│   │   │   └── 📄 UploadModal.tsx (16 Ko)
+│   │   ├── 📁 Transcription/
+│   │   │   ├── 📄 TranscriptionEditor.tsx (16 Ko)
+│   │   │   ├── 📄 TranscriptionResults.tsx (13 Ko)
+│   │   │   └── 📄 TranscriptionUpload.tsx (12 Ko)
+│   │   ├── 📁 new-project/
+│   │   ├── 📁 settings/
+│   │   ├── 📄 AnalyticsPage.tsx (27 Ko)
+│   │   ├── 📄 AudiosPage.tsx (24 Ko)
+│   │   ├── 📄 DocumentsPage.tsx (17 Ko)
+│   │   ├── 📄 ProjectDetail.tsx (19 Ko)
+│   │   ├── 📄 ProjectsPage.tsx (11 Ko)
+│   │   ├── 📄 SettingsPage.tsx (30 Ko)
+│   │   └── 📄 VideosPage.tsx (8 Ko)
+│   ├── 📁 contexts/
+│   │   ├── 📄 AuthContext.tsx (10 Ko)
+│   │   └── 📄 ThemeContext.tsx (7 Ko)
+│   ├── 📁 controllers/
+│   ├── 📁 hooks/
+│   ├── 📁 i18n/
+│   ├── 📁 locales/
+│   │   ├── 📁 de/
+│   │   ├── 📁 en/
+│   │   ├── 📁 es/
+│   │   ├── 📁 fr/
+│   │   └── 📁 it/
+│   ├── 📁 middleware/
+│   ├── 📁 pages/  ✅ (DOSSIER PRINCIPAL DES PAGES)
+│   │   ├── 📄 AnalyticsPage.tsx (24 Ko)
+│   │   ├── 📄 AudiosPage.tsx (23 Ko)
+│   │   ├── 📄 CloudIntegrationsPage.tsx (15 Ko)
+│   │   ├── 📄 DocumentsPage.tsx (79 Ko)
+│   │   ├── 📄 IntegrationsPage.tsx (36 Ko)
+│   │   ├── 📄 PricingPage.tsx (20 Ko) ✅
+│   │   ├── 📄 ProjectsPage.tsx (43 Ko)
+│   │   ├── 📄 SectorConfigPage.tsx (14 Ko)
+│   │   ├── 📄 SettingsPage.tsx (47 Ko) ✅
+│   │   ├── 📄 SimpleTranscriptionPage.tsx (1 Ko)
+│   │   ├── 📄 TestPage.tsx (1 Ko)
+│   │   ├── 📄 TranscriptionPage.tsx (52 Ko)
+│   │   ├── 📄 TranslationPage.tsx (45 Ko)
+│   │   └── 📄 VideosPage.tsx (27 Ko)
+│   ├── 📁 routes/
+│   ├── 📁 services/
+│   ├── 📁 types/
+│   ├── 📁 utils/
+│   ├── 📄 App.tsx (7 Ko)
+│   ├── 📄 App_BACKUP.tsx (1 Ko)
+│   ├── 📄 App_OLD.tsx (1 Ko)
+│   ├── 📄 index.css (3 Ko)
+│   ├── 📄 main.tsx (1 Ko)
+│   ├── 📄 server.ts (3 Ko)
+│   └── 📄 vite-env.d.ts (1 Ko)
+├── 📄 .env
+├── 📄 .env.example
+├── 📄 .gitignore
+├── 📄 eslint.config.js
+├── 📄 index.html
+├── 📄 package.json
+├── 📄 package-lock.json
+├── 📄 postcss.config.js
+├── 📄 README.md
+├── 📄 tailwind.config.js
+├── 📄 tsconfig.app.json
+├── 📄 tsconfig.json
+├── 📄 tsconfig.node.json
+└── 📄 vite.config.ts
