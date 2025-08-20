@@ -1,101 +1,70 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const { createServer } = require('http');
-const { Server } = require('socket.io');
-require('dotenv').config();
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
-  }
-});
+const PORT = process.env.PORT || 5000;
 
-// Import routes
-const authRoutes = require('./src/routes/authRoutes');
-const projectRoutes = require('./src/routes/projectRoutes');
-const documentRoutes = require('./src/routes/documentRoutes');
-const transcriptionRoutes = require('./src/routes/transcriptionRoutes');
-const analyticsRoutes = require('./src/routes/analyticsRoutes');
-
-// Import middleware
-const errorHandler = require('./src/middleware/errorHandler');
-const { initializeWebSocket } = require('./src/services/websocketService');
-
-// Security middleware
+// Middleware
 app.use(helmet());
+app.use(compression());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
+app.use(express.json());
 
-// Body parsing middleware
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(compression());
-
-// Logging
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limite chaque IP à 100 requêtes par fenêtre
-  message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard.'
-});
-
-app.use('/api/', limiter);
-
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/documents', documentRoutes);
-app.use('/api/transcriptions', transcriptionRoutes);
-app.use('/api/analytics', analyticsRoutes);
-
-// Health check
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+// Route de santé
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '2.5.0',
+    message: 'TraduckXion Backend API is running!'
   });
 });
 
-// Static files pour les uploads
-app.use('/uploads', express.static('uploads'));
-
-// Error handling middleware (doit être en dernier)
-app.use(errorHandler);
-
-// Initialize WebSocket
-initializeWebSocket(io);
-
-// Start server
-const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server');
-  httpServer.close(() => {
-    console.log('HTTP server closed');
-    process.exit(0);
+// Routes basiques pour test
+app.post('/api/auth/register', (req, res) => {
+  const { email, password, firstName, lastName } = req.body;
+  res.json({
+    success: true,
+    message: 'User registered successfully',
+    user: { email, firstName, lastName },
+    token: 'fake-jwt-token-' + Date.now()
   });
 });
 
-module.exports = { app, io };
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  res.json({
+    success: true,
+    message: 'Login successful',
+    token: 'fake-jwt-token-' + Date.now(),
+    user: { email }
+  });
+});
+
+app.get('/api/auth/profile', (req, res) => {
+  res.json({
+    success: true,
+    email: 'test@example.com',
+    firstName: 'Test',
+    lastName: 'User'
+  });
+});
+
+// Démarrage du serveur
+app.listen(PORT, () => {
+  console.log(`
+    ========================================
+    🚀 TraduckXion Backend v2.5
+    📡 Serveur démarré sur le port ${PORT}
+    🌍 http://localhost:${PORT}
+    📅 ${new Date().toLocaleString('fr-FR')}
+    ========================================
+  `);
+});

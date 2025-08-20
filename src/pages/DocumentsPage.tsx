@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next'; // ✅ AJOUT i18n
 import {
   FileText,
   Search,
@@ -58,7 +59,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// Types améliorés pour TraduckXion
+// Types améliorés pour TraduckXion (conservés tels quels)
 interface Document {
   id: string;
   name: string;
@@ -71,10 +72,10 @@ interface Document {
   modifiedAt: string;
   status: 'transcribed' | 'processing' | 'pending' | 'error' | 'ready' | 'translating';
   language?: string;
-  targetLanguages?: string[]; // Pour les traductions
+  targetLanguages?: string[];
   duration?: number;
   transcription?: string;
-  translation?: { [key: string]: string }; // Traductions par langue
+  translation?: { [key: string]: string };
   url?: string;
   thumbnail?: string;
   tags: string[];
@@ -85,13 +86,12 @@ interface Document {
   versions: DocumentVersion[];
   comments: Comment[];
   permissions: 'view' | 'edit' | 'admin';
-  // Nouveaux champs TraduckXion
   sector?: 'medical' | 'legal' | 'business' | 'education' | 'media';
-  accuracy?: number; // Précision de transcription
-  wer?: number; // Word Error Rate
-  confidence?: number; // Niveau de confiance IA
-  aiModel?: string; // Modèle IA utilisé
-  pages?: number; // Pour les documents PDF/DOCX
+  accuracy?: number;
+  wer?: number;
+  confidence?: number;
+  aiModel?: string;
+  pages?: number;
 }
 
 interface DocumentVersion {
@@ -119,7 +119,7 @@ interface Folder {
   createdAt: string;
   documentsCount: number;
   expanded: boolean;
-  color?: string; // Couleur par secteur
+  color?: string;
   sector?: string;
 }
 
@@ -138,7 +138,6 @@ interface DocumentStats {
   byLanguage: { [key: string]: number };
 }
 
-// Composants existants conservés
 interface ShareModalProps {
   document: Document;
   onClose: () => void;
@@ -153,8 +152,9 @@ interface PreviewModalProps {
   onTranslate?: () => void;
 }
 
-// Modal de Partage (conservé et amélioré)
+// Modal de Partage avec i18n
 const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) => {
+  const { t } = useTranslation('documents'); // ✅ Hook i18n
   const [emails, setEmails] = useState('');
   const [permission, setPermission] = useState('view');
   const [message, setMessage] = useState('');
@@ -163,19 +163,19 @@ const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) =
   const handleShare = () => {
     const emailList = emails.split(',').map(e => e.trim()).filter(e => e);
     if (emailList.length === 0 && !copyLink) {
-      toast.error('Veuillez entrer au moins une adresse email ou copier le lien');
+      toast.error(t('modals.share.errorNoEmail'));
       return;
     }
     
     if (copyLink) {
       const shareUrl = `${window.location.origin}/shared/${document.id}`;
       navigator.clipboard.writeText(shareUrl);
-      toast.success('Lien copié dans le presse-papier');
+      toast.success(t('modals.share.linkCopied'));
     }
     
     if (emailList.length > 0) {
       onShare(emailList, permission);
-      toast.success('Document partagé avec succès');
+      toast.success(t('modals.share.shareSuccess'));
     }
     
     onClose();
@@ -185,7 +185,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) =
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Partager "{document.name}"</h2>
+          <h2 className="text-xl font-bold">{t('modals.share.title', { name: document.name })}</h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg">
             <X className="w-5 h-5" />
           </button>
@@ -193,26 +193,26 @@ const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) =
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Adresses email</label>
+            <label className="block text-sm font-medium mb-2">{t('modals.share.emailLabel')}</label>
             <input
               type="text"
               value={emails}
               onChange={(e) => setEmails(e.target.value)}
-              placeholder="email1@example.com, email2@example.com"
+              placeholder={t('modals.share.placeholder')}
               className="w-full px-3 py-2 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Permissions</label>
+            <label className="block text-sm font-medium mb-2">{t('modals.share.permissionsLabel')}</label>
             <select
               value={permission}
               onChange={(e) => setPermission(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="view">Lecture seule</option>
-              <option value="edit">Modification</option>
-              <option value="admin">Administration</option>
+              <option value="view">{t('modals.share.readOnly')}</option>
+              <option value="edit">{t('modals.share.edit')}</option>
+              <option value="admin">{t('modals.share.admin')}</option>
             </select>
           </div>
 
@@ -225,16 +225,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) =
               className="rounded"
             />
             <label htmlFor="copyLink" className="text-sm">
-              Copier le lien de partage
+              {t('modals.share.copyLink')}
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Message (optionnel)</label>
+            <label className="block text-sm font-medium mb-2">{t('modals.share.messageLabel')}</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ajouter un message..."
+              placeholder={t('modals.share.messagePlaceholder')}
               rows={3}
               className="w-full px-3 py-2 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             />
@@ -245,14 +245,14 @@ const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) =
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
             >
-              Annuler
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleShare}
               className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               <Share2 className="w-4 h-4" />
-              Partager
+              {t('common.share')}
             </button>
           </div>
         </div>
@@ -261,26 +261,27 @@ const ShareModal: React.FC<ShareModalProps> = ({ document, onClose, onShare }) =
   );
 };
 
-// Modal de Preview amélioré avec IA
+// Modal de Preview avec i18n
 const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, onTranscribe, onTranslate }) => {
+  const { t } = useTranslation('documents'); // ✅ Hook i18n
   const [activeTab, setActiveTab] = useState<'preview' | 'details' | 'versions' | 'comments' | 'ai'>('preview');
   const [comment, setComment] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
 
   const handleAddComment = () => {
     if (!comment.trim()) return;
-    toast.success('Commentaire ajouté');
+    toast.success(t('modals.preview.commentAdded'));
     setComment('');
   };
 
   const handleTranslate = () => {
     if (selectedLanguages.length === 0) {
-      toast.error('Sélectionnez au moins une langue');
+      toast.error(t('modals.preview.selectLanguage'));
       return;
     }
     if (onTranslate) {
       onTranslate();
-      toast.success(`Traduction lancée vers ${selectedLanguages.length} langue(s)`);
+      toast.success(t('modals.preview.translationStarted', { count: selectedLanguages.length }));
     }
   };
 
@@ -295,7 +296,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-lg w-full max-w-5xl h-[85vh] flex flex-col">
-        {/* Header amélioré */}
+        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-700">
           <div className="flex items-center gap-4">
             <FileText className="w-6 h-6 text-indigo-500" />
@@ -304,7 +305,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 {document.name}
                 {document.sector && (
                   <span className="text-xs px-2 py-1 bg-indigo-600/20 text-indigo-400 rounded">
-                    {document.sector}
+                    {t(`sectors.${document.sector}`)}
                   </span>
                 )}
               </h2>
@@ -313,7 +314,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 {document.accuracy && (
                   <span className="flex items-center gap-1">
                     <Target className="w-3 h-3" />
-                    {document.accuracy.toFixed(1)}% précision
+                    {document.accuracy.toFixed(1)}% {t('modals.preview.precision')}
                   </span>
                 )}
                 {document.wer && (
@@ -332,7 +333,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 className="px-3 py-1 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm flex items-center gap-2"
               >
                 <Brain className="w-4 h-4" />
-                Transcrire
+                {t('actions.transcribe')}
               </button>
             )}
             {document.transcription && !document.translation && onTranslate && (
@@ -341,20 +342,20 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm flex items-center gap-2"
               >
                 <Languages className="w-4 h-4" />
-                Traduire
+                {t('actions.translate')}
               </button>
             )}
             <button
               onClick={onEdit}
               className="p-2 hover:bg-gray-700 rounded-lg"
-              title="Éditer"
+              title={t('actions.edit')}
             >
               <Edit className="w-5 h-5" />
             </button>
             <button
               onClick={() => window.open(document.url, '_blank')}
               className="p-2 hover:bg-gray-700 rounded-lg"
-              title="Ouvrir dans un nouvel onglet"
+              title={t('modals.preview.openNewTab')}
             >
               <Maximize2 className="w-5 h-5" />
             </button>
@@ -364,7 +365,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
           </div>
         </div>
 
-        {/* Tabs avec nouvel onglet IA */}
+        {/* Tabs */}
         <div className="flex border-b border-gray-700">
           {(['preview', 'details', 'ai', 'versions', 'comments'] as const).map((tab) => (
             <button
@@ -376,21 +377,21 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                   : 'hover:bg-gray-700/50'
               }`}
             >
-              {tab === 'preview' && 'Aperçu'}
-              {tab === 'details' && 'Détails'}
-              {tab === 'ai' && (
+              {tab === 'ai' ? (
                 <span className="flex items-center gap-1">
                   <Sparkles className="w-4 h-4" />
-                  Intelligence IA
+                  {t('modals.preview.tabs.ai')}
                 </span>
+              ) : (
+                t(`modals.preview.tabs.${tab}`)
               )}
-              {tab === 'versions' && `Versions (${document.versions.length})`}
-              {tab === 'comments' && `Commentaires (${document.comments.length})`}
+              {tab === 'versions' && ` (${document.versions.length})`}
+              {tab === 'comments' && ` (${document.comments.length})`}
             </button>
           ))}
         </div>
 
-        {/* Content */}
+        {/* Content (conservé avec traductions minimales) */}
         <div className="flex-1 overflow-auto p-6">
           {activeTab === 'preview' && (
             <div className="space-y-4">
@@ -398,7 +399,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 <div className="bg-gray-900 rounded-lg p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <FileEdit className="w-5 h-5 text-violet-400" />
-                    Transcription
+                    {t('modals.preview.transcription')}
                     {document.language && (
                       <span className="text-sm text-gray-400">
                         ({availableLanguages.find(l => l.code === document.language)?.flag} {document.language.toUpperCase()})
@@ -406,12 +407,12 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                     )}
                   </h3>
                   <p className="whitespace-pre-wrap text-gray-300">
-                    {document.transcription || 'Transcription en cours de traitement...'}
+                    {document.transcription || t('modals.preview.transcriptionProcessing')}
                   </p>
                   
                   {document.translation && Object.keys(document.translation).length > 0 && (
                     <div className="mt-6 pt-6 border-t border-gray-700">
-                      <h4 className="text-md font-semibold mb-3">Traductions disponibles</h4>
+                      <h4 className="text-md font-semibold mb-3">{t('modals.preview.availableTranslations')}</h4>
                       <div className="space-y-3">
                         {Object.entries(document.translation).map(([lang, text]) => (
                           <div key={lang} className="bg-gray-800 rounded-lg p-4">
@@ -434,11 +435,11 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 <div className="bg-gray-900 rounded-lg p-6">
                   <audio controls className="w-full">
                     <source src={document.url} type="audio/mpeg" />
-                    Votre navigateur ne supporte pas l'audio.
+                    {t('modals.preview.audioNotSupported')}
                   </audio>
                   {document.duration && (
                     <p className="text-sm text-gray-400 mt-2">
-                      Durée : {Math.floor(document.duration / 60)}min {document.duration % 60}s
+                      {t('modals.preview.duration')}: {Math.floor(document.duration / 60)}min {document.duration % 60}s
                     </p>
                   )}
                 </div>
@@ -446,7 +447,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                 <div className="bg-gray-900 rounded-lg p-6">
                   <video controls className="w-full rounded-lg">
                     <source src={document.url} type="video/mp4" />
-                    Votre navigateur ne supporte pas la vidéo.
+                    {t('modals.preview.videoNotSupported')}
                   </video>
                 </div>
               ) : document.type === 'image' ? (
@@ -456,12 +457,12 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
               ) : (
                 <div className="bg-gray-900 rounded-lg p-6 text-center">
                   <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400">Aperçu non disponible pour ce type de fichier</p>
+                  <p className="text-gray-400">{t('modals.preview.previewNotAvailable')}</p>
                   <button
                     onClick={() => window.open(document.url, '_blank')}
                     className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg"
                   >
-                    Télécharger le fichier
+                    {t('actions.downloadFile')}
                   </button>
                 </div>
               )}
@@ -472,55 +473,55 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-gray-400">Type</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.details.type')}</label>
                   <p className="font-medium">{document.type}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Taille</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.details.size')}</label>
                   <p className="font-medium">{formatFileSize(document.size)}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Langue source</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.details.sourceLanguage')}</label>
                   <p className="font-medium">
                     {document.language ? (
                       <>
                         {availableLanguages.find(l => l.code === document.language)?.flag}{' '}
                         {availableLanguages.find(l => l.code === document.language)?.name}
                       </>
-                    ) : 'Non définie'}
+                    ) : t('modals.preview.details.notDefined')}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Durée</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.duration')}</label>
                   <p className="font-medium">{formatDuration(document.duration)}</p>
                 </div>
                 {document.pages && (
                   <div>
-                    <label className="text-sm text-gray-400">Pages</label>
+                    <label className="text-sm text-gray-400">{t('modals.preview.details.pages')}</label>
                     <p className="font-medium">{document.pages}</p>
                   </div>
                 )}
                 {document.sector && (
                   <div>
-                    <label className="text-sm text-gray-400">Secteur</label>
+                    <label className="text-sm text-gray-400">{t('modals.preview.details.sector')}</label>
                     <p className="font-medium flex items-center gap-2">
                       {getSectorIcon(document.sector)}
-                      {document.sector}
+                      {t(`sectors.${document.sector}`)}
                     </p>
                   </div>
                 )}
                 <div>
-                  <label className="text-sm text-gray-400">Créé le</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.details.createdAt')}</label>
                   <p className="font-medium">{new Date(document.createdAt).toLocaleString('fr-FR')}</p>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-400">Modifié le</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.details.modifiedAt')}</label>
                   <p className="font-medium">{new Date(document.modifiedAt).toLocaleString('fr-FR')}</p>
                 </div>
               </div>
               
               <div>
-                <label className="text-sm text-gray-400">Tags</label>
+                <label className="text-sm text-gray-400">{t('modals.preview.details.tags')}</label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {document.tags.map((tag, index) => (
                     <span key={index} className="px-2 py-1 bg-gray-700 rounded text-sm">
@@ -535,7 +536,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
               
               {document.targetLanguages && document.targetLanguages.length > 0 && (
                 <div>
-                  <label className="text-sm text-gray-400">Langues de traduction</label>
+                  <label className="text-sm text-gray-400">{t('modals.preview.details.translationLanguages')}</label>
                   <div className="flex gap-2 mt-2">
                     {document.targetLanguages.map((lang) => (
                       <span key={lang} className="text-2xl">
@@ -547,7 +548,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
               )}
               
               <div>
-                <label className="text-sm text-gray-400">Partagé avec</label>
+                <label className="text-sm text-gray-400">{t('modals.preview.details.sharedWith')}</label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {document.sharedWith.map((email, index) => (
                     <span key={index} className="px-2 py-1 bg-indigo-600/20 text-indigo-400 rounded text-sm">
@@ -559,14 +560,13 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
             </div>
           )}
 
-          {/* Nouvel onglet IA */}
+          {/* Onglet IA */}
           {activeTab === 'ai' && (
             <div className="space-y-6">
-              {/* Métriques IA */}
               <div className="bg-gray-900 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Brain className="w-5 h-5 text-violet-400" />
-                  Métriques d'Intelligence Artificielle
+                  {t('modals.preview.ai.metricsTitle')}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-800 rounded-lg p-4">
@@ -576,7 +576,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                         {document.accuracy ? `${document.accuracy.toFixed(1)}%` : 'N/A'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">Précision</p>
+                    <p className="text-sm text-gray-400">{t('modals.preview.ai.precision')}</p>
                   </div>
                   
                   <div className="bg-gray-800 rounded-lg p-4">
@@ -596,7 +596,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                         {document.confidence ? `${(document.confidence * 100).toFixed(0)}%` : 'N/A'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">Confiance</p>
+                    <p className="text-sm text-gray-400">{t('modals.preview.ai.confidence')}</p>
                   </div>
                   
                   <div className="bg-gray-800 rounded-lg p-4">
@@ -606,23 +606,22 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                         {document.aiModel || 'Whisper V3'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">Modèle IA</p>
+                    <p className="text-sm text-gray-400">{t('modals.preview.ai.model')}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Suggestions d'amélioration */}
               <div className="bg-gray-900 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-indigo-400" />
-                  Suggestions d'amélioration IA
+                  {t('modals.preview.ai.suggestionsTitle')}
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 p-3 bg-gray-800 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-emerald-400 mt-0.5" />
                     <div>
-                      <p className="font-medium">Qualité audio excellente</p>
-                      <p className="text-sm text-gray-400">Le fichier audio est clair avec peu de bruit de fond</p>
+                      <p className="font-medium">{t('modals.preview.ai.audioQuality')}</p>
+                      <p className="text-sm text-gray-400">{t('modals.preview.ai.audioQualityDesc')}</p>
                     </div>
                   </div>
                   
@@ -630,9 +629,9 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                     <div className="flex items-start gap-3 p-3 bg-gray-800 rounded-lg">
                       <AlertCircle className="w-5 h-5 text-amber-400 mt-0.5" />
                       <div>
-                        <p className="font-medium">WER élevé détecté</p>
+                        <p className="font-medium">{t('modals.preview.ai.highWer')}</p>
                         <p className="text-sm text-gray-400">
-                          Envisagez d'utiliser un modèle spécialisé pour le secteur {document.sector}
+                          {t('modals.preview.ai.highWerDesc', { sector: t(`sectors.${document.sector}`) })}
                         </p>
                       </div>
                     </div>
@@ -642,20 +641,17 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                     <div className="flex items-start gap-3 p-3 bg-gray-800 rounded-lg">
                       <Languages className="w-5 h-5 text-indigo-400 mt-0.5" />
                       <div>
-                        <p className="font-medium">Traduction disponible</p>
-                        <p className="text-sm text-gray-400">
-                          Ce document peut être traduit en 5 langues avec une précision de 94%+
-                        </p>
+                        <p className="font-medium">{t('modals.preview.ai.translationAvailable')}</p>
+                        <p className="text-sm text-gray-400">{t('modals.preview.ai.translationAvailableDesc')}</p>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Sélection des langues pour traduction */}
               {document.transcription && !document.translation && (
                 <div className="bg-gray-900 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-4">Traduire le document</h3>
+                  <h3 className="text-lg font-semibold mb-4">{t('modals.preview.ai.translateDocument')}</h3>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
                     {availableLanguages
                       .filter(lang => lang.code !== document.language)
@@ -687,7 +683,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                     disabled={selectedLanguages.length === 0}
                     className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
                   >
-                    Lancer la traduction
+                    {t('modals.preview.ai.startTranslation')}
                   </button>
                 </div>
               )}
@@ -699,9 +695,9 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
               {document.versions.map((version) => (
                 <div key={version.id} className="p-4 bg-gray-900 rounded-lg flex items-center justify-between">
                   <div>
-                    <div className="font-medium">Version {version.version}</div>
+                    <div className="font-medium">{t('modals.preview.version')} {version.version}</div>
                     <div className="text-sm text-gray-400">
-                      {version.changes} • Par {version.createdBy}
+                      {version.changes} • {t('modals.preview.by')} {version.createdBy}
                     </div>
                     <div className="text-xs text-gray-500">
                       {new Date(version.createdAt).toLocaleString('fr-FR')}
@@ -727,14 +723,14 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                   type="text"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Ajouter un commentaire..."
+                  placeholder={t('modals.preview.addComment')}
                   className="flex-1 px-3 py-2 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <button
                   onClick={handleAddComment}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg"
                 >
-                  Envoyer
+                  {t('common.send')}
                 </button>
               </div>
               
@@ -750,7 +746,7 @@ const PreviewModal: React.FC<PreviewModalProps> = ({ document, onClose, onEdit, 
                     <p className="text-gray-300">{comment.text}</p>
                     {comment.resolved && (
                       <span className="text-xs text-emerald-400 mt-2 inline-block">
-                        ✓ Résolu
+                        ✓ {t('modals.preview.resolved')}
                       </span>
                     )}
                   </div>
@@ -791,8 +787,9 @@ const getSectorIcon = (sector?: string) => {
   }
 };
 
-// Composant principal DocumentsPage (fusion)
+// Composant principal DocumentsPage avec i18n
 const DocumentsPage: React.FC = () => {
+  const { t } = useTranslation('documents'); // ✅ Hook i18n principal
   const [documents, setDocuments] = useState<Document[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -861,13 +858,11 @@ const DocumentsPage: React.FC = () => {
   const loadDocuments = async () => {
     setIsLoading(true);
     try {
-      // Charger depuis l'API ou localStorage (conservé du code existant)
       const projects = JSON.parse(localStorage.getItem('localProjects') || '[]');
       const transcriptions = JSON.parse(localStorage.getItem('transcriptionHistory') || '[]');
       
       const docs: Document[] = [];
       
-      // Ajouter les transcriptions comme documents (conservé)
       transcriptions.forEach((trans: any, index: number) => {
         docs.push({
           id: `trans_${index}`,
@@ -894,8 +889,8 @@ const DocumentsPage: React.FC = () => {
             id: `v_${index}_1`,
             version: 1,
             createdAt: trans.timestamp || new Date().toISOString(),
-            createdBy: 'Vous',
-            changes: 'Version initiale',
+            createdBy: t('common.you'),
+            changes: t('modals.preview.initialVersion'),
             size: trans.text?.length || 1000
           }],
           comments: [],
@@ -903,7 +898,6 @@ const DocumentsPage: React.FC = () => {
         });
       });
       
-      // Ajouter des documents de démonstration améliorés pour TraduckXion
       const demoDocuments: Document[] = [
         {
           id: 'demo_1',
@@ -912,7 +906,7 @@ const DocumentsPage: React.FC = () => {
           size: 2457600,
           pages: 45,
           projectId: 'proj_medical',
-          projectName: 'Dossiers Médicaux',
+          projectName: t('demo.medicalProject'),
           folderId: 'folder_medical',
           createdAt: '2025-01-10T10:00:00Z',
           modifiedAt: '2025-01-10T11:30:00Z',
@@ -924,7 +918,7 @@ const DocumentsPage: React.FC = () => {
             en: 'Complete medical report of the patient...',
             es: 'Informe médico completo del paciente...'
           },
-          tags: ['médical', 'urgent', 'confidentiel'],
+          tags: [t('tags.medical'), t('tags.urgent'), t('tags.confidential')],
           starred: true,
           shared: false,
           sharedWith: [],
@@ -935,7 +929,7 @@ const DocumentsPage: React.FC = () => {
               version: 1,
               createdAt: '2025-01-10T10:00:00Z',
               createdBy: 'Dr. Martin',
-              changes: 'Version initiale',
+              changes: t('modals.preview.initialVersion'),
               size: 2457600
             },
             {
@@ -943,7 +937,7 @@ const DocumentsPage: React.FC = () => {
               version: 2,
               createdAt: '2025-01-10T11:30:00Z',
               createdBy: 'Dr. Martin',
-              changes: 'Ajout des résultats d\'analyse',
+              changes: t('demo.addAnalysisResults'),
               size: 2457600
             }
           ],
@@ -962,13 +956,13 @@ const DocumentsPage: React.FC = () => {
           size: 1048576,
           pages: 12,
           projectId: 'proj_legal',
-          projectName: 'Documents Juridiques',
+          projectName: t('demo.legalProject'),
           folderId: 'folder_legal',
           createdAt: '2025-01-11T14:00:00Z',
           modifiedAt: '2025-01-11T16:00:00Z',
           status: 'processing',
           language: 'fr',
-          tags: ['contrat', 'juridique', 'commercial'],
+          tags: [t('tags.contract'), t('tags.legal'), t('tags.commercial')],
           starred: false,
           shared: true,
           sharedWith: ['avocat@cabinet.com'],
@@ -978,7 +972,7 @@ const DocumentsPage: React.FC = () => {
             version: 1,
             createdAt: '2025-01-11T14:00:00Z',
             createdBy: 'Me. Dubois',
-            changes: 'Version initiale',
+            changes: t('modals.preview.initialVersion'),
             size: 1048576
           }],
           comments: [
@@ -986,7 +980,7 @@ const DocumentsPage: React.FC = () => {
               id: 'c1',
               userId: 'user1',
               userName: 'Me. Dupont',
-              text: 'À revoir clause 3.2',
+              text: t('demo.reviewClause'),
               createdAt: '2025-01-11T15:00:00Z',
               resolved: false
             }
@@ -1003,7 +997,7 @@ const DocumentsPage: React.FC = () => {
           type: 'video',
           size: 104857600,
           projectId: 'proj_business',
-          projectName: 'Webinars Business',
+          projectName: t('demo.businessProject'),
           createdAt: '2025-01-08T14:00:00Z',
           modifiedAt: '2025-01-09T09:00:00Z',
           status: 'transcribed',
@@ -1025,7 +1019,7 @@ const DocumentsPage: React.FC = () => {
             version: 1,
             createdAt: '2025-01-08T14:00:00Z',
             createdBy: 'Marketing Team',
-            changes: 'Upload initial',
+            changes: t('demo.initialUpload'),
             size: 104857600
           }],
           comments: [],
@@ -1041,18 +1035,17 @@ const DocumentsPage: React.FC = () => {
       setDocuments([...docs, ...demoDocuments]);
     } catch (error) {
       console.error('Erreur chargement documents:', error);
-      toast.error('Erreur lors du chargement des documents');
+      toast.error(t('errors.loadingDocuments'));
     } finally {
       setIsLoading(false);
     }
   };
 
   const loadFolders = () => {
-    // Dossiers améliorés avec secteurs
     const demoFolders: Folder[] = [
       {
         id: 'folder_medical',
-        name: 'Médical',
+        name: t('sectors.medical'),
         createdAt: '2025-01-01T00:00:00Z',
         documentsCount: 12,
         expanded: true,
@@ -1061,7 +1054,7 @@ const DocumentsPage: React.FC = () => {
       },
       {
         id: 'folder_legal',
-        name: 'Juridique',
+        name: t('sectors.legal'),
         createdAt: '2025-01-01T00:00:00Z',
         documentsCount: 8,
         expanded: false,
@@ -1070,7 +1063,7 @@ const DocumentsPage: React.FC = () => {
       },
       {
         id: 'folder_business',
-        name: 'Business',
+        name: t('sectors.business'),
         createdAt: '2025-01-01T00:00:00Z',
         documentsCount: 15,
         expanded: false,
@@ -1079,7 +1072,7 @@ const DocumentsPage: React.FC = () => {
       },
       {
         id: 'folder_education',
-        name: 'Éducation',
+        name: t('sectors.education'),
         createdAt: '2025-01-01T00:00:00Z',
         documentsCount: 20,
         expanded: false,
@@ -1088,7 +1081,7 @@ const DocumentsPage: React.FC = () => {
       },
       {
         id: 'folder_media',
-        name: 'Média',
+        name: t('sectors.media'),
         createdAt: '2025-01-01T00:00:00Z',
         documentsCount: 18,
         expanded: false,
@@ -1100,7 +1093,6 @@ const DocumentsPage: React.FC = () => {
     setFolders(demoFolders);
   };
 
-  // Gestion du drag & drop
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1155,8 +1147,8 @@ const DocumentsPage: React.FC = () => {
               id: `v_new_1`,
               version: 1,
               createdAt: new Date().toISOString(),
-              createdBy: 'Vous',
-              changes: 'Upload initial',
+              createdBy: t('common.you'),
+              changes: t('demo.initialUpload'),
               size: file.size
             }],
             comments: [],
@@ -1165,7 +1157,6 @@ const DocumentsPage: React.FC = () => {
           
           setDocuments(prev => [...prev, newDoc]);
           
-          // Simuler le traitement automatique
           setTimeout(() => {
             handleTranscribe(newDoc);
           }, 2000);
@@ -1178,9 +1169,9 @@ const DocumentsPage: React.FC = () => {
     toast.promise(
       Promise.all(uploadPromises),
       {
-        loading: 'Upload en cours...',
-        success: `${files.length} fichier(s) uploadé(s)`,
-        error: 'Erreur lors de l\'upload'
+        loading: t('upload.uploading'),
+        success: t('upload.success', { count: files.length }),
+        error: t('upload.error')
       }
     );
   };
@@ -1229,14 +1220,13 @@ const DocumentsPage: React.FC = () => {
         : d
     ));
     
-    // Simuler la transcription
     setTimeout(() => {
       setDocuments(prev => prev.map(d => 
         d.id === doc.id 
           ? { 
               ...d, 
               status: 'transcribed' as const,
-              transcription: 'Transcription automatique générée par IA...',
+              transcription: t('demo.aiTranscription'),
               accuracy: 95 + Math.random() * 4,
               wer: 2 + Math.random() * 2,
               confidence: 0.9 + Math.random() * 0.1,
@@ -1245,7 +1235,7 @@ const DocumentsPage: React.FC = () => {
             } 
           : d
       ));
-      toast.success('Transcription terminée');
+      toast.success(t('transcription.completed'));
     }, 3000);
   };
 
@@ -1262,11 +1252,10 @@ const DocumentsPage: React.FC = () => {
         : d
     ));
     
-    // Simuler la traduction
     setTimeout(() => {
       const translations: { [key: string]: string } = {};
       targetLangs.forEach(lang => {
-        translations[lang] = `Traduction en ${lang} du document...`;
+        translations[lang] = t('demo.translationText', { lang });
       });
       
       setDocuments(prev => prev.map(d => 
@@ -1278,16 +1267,16 @@ const DocumentsPage: React.FC = () => {
             } 
           : d
       ));
-      toast.success(`Document traduit en ${targetLangs.length} langue(s)`);
+      toast.success(t('translation.completed', { count: targetLangs.length }));
     }, 3000);
   };
 
   const handleDelete = (docIds: string[]) => {
-    if (!confirm(`Voulez-vous vraiment supprimer ${docIds.length} document(s) ?`)) return;
+    if (!confirm(t('confirmDelete', { count: docIds.length }))) return;
     
     setDocuments(documents.filter(d => !docIds.includes(d.id)));
     setSelectedDocuments([]);
-    toast.success(`${docIds.length} document(s) supprimé(s)`);
+    toast.success(t('deleteSuccess', { count: docIds.length }));
   };
 
   const handleDownload = (docs: Document[]) => {
@@ -1304,7 +1293,7 @@ const DocumentsPage: React.FC = () => {
         URL.revokeObjectURL(url);
       }
     });
-    toast.success(`${docs.length} document(s) téléchargé(s)`);
+    toast.success(t('downloadSuccess', { count: docs.length }));
   };
 
   const handleShare = (emails: string[], permission: string) => {
@@ -1333,7 +1322,7 @@ const DocumentsPage: React.FC = () => {
   };
 
   const createFolder = () => {
-    const name = prompt('Nom du nouveau dossier :');
+    const name = prompt(t('folders.newFolderPrompt'));
     if (!name) return;
     
     const newFolder: Folder = {
@@ -1345,10 +1334,9 @@ const DocumentsPage: React.FC = () => {
     };
     
     setFolders([...folders, newFolder]);
-    toast.success('Dossier créé');
+    toast.success(t('folders.created'));
   };
 
-  // Filtrage et tri améliorés
   const filteredAndSortedDocuments = documents
     .filter(doc => {
       const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1385,7 +1373,7 @@ const DocumentsPage: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-indigo-500 mx-auto mb-4" />
-          <p className="text-gray-400">Chargement des documents...</p>
+          <p className="text-gray-400">{t('loading')}</p>
         </div>
       </div>
     );
@@ -1396,14 +1384,14 @@ const DocumentsPage: React.FC = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
-          Documents TraduckXion
+          {t('title')}
         </h1>
         <p className="text-gray-400">
-          Gérez vos fichiers, transcriptions et traductions multilingues
+          {t('subtitle')}
         </p>
       </div>
 
-      {/* Stats Cards améliorées */}
+      {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1411,7 +1399,7 @@ const DocumentsPage: React.FC = () => {
               <FileText className="w-6 h-6 text-indigo-500" />
               <span className="text-xl font-bold">{stats.total}</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Total</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.total')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1419,7 +1407,7 @@ const DocumentsPage: React.FC = () => {
               <Brain className="w-6 h-6 text-violet-500" />
               <span className="text-xl font-bold">{stats.transcribed}</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Transcrits</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.transcribed')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1427,7 +1415,7 @@ const DocumentsPage: React.FC = () => {
               <Languages className="w-6 h-6 text-emerald-500" />
               <span className="text-xl font-bold">{stats.translated}</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Traduits</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.translated')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1435,7 +1423,7 @@ const DocumentsPage: React.FC = () => {
               <Database className="w-6 h-6 text-amber-500" />
               <span className="text-lg font-bold">{formatFileSize(stats.totalSize)}</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Espace</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.space')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1443,7 +1431,7 @@ const DocumentsPage: React.FC = () => {
               <Target className="w-6 h-6 text-green-500" />
               <span className="text-xl font-bold">{stats.averageAccuracy.toFixed(1)}%</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Précision</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.precision')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1451,7 +1439,7 @@ const DocumentsPage: React.FC = () => {
               <Activity className="w-6 h-6 text-red-500" />
               <span className="text-xl font-bold">{stats.averageWER.toFixed(1)}%</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">WER moy.</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.wer')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1459,7 +1447,7 @@ const DocumentsPage: React.FC = () => {
               <FileAudio className="w-6 h-6 text-blue-500" />
               <span className="text-xl font-bold">{stats.audio}</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Audios</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.audios')}</p>
           </div>
           
           <div className="bg-gray-800 rounded-lg p-3 border border-gray-700">
@@ -1467,12 +1455,12 @@ const DocumentsPage: React.FC = () => {
               <FileVideo className="w-6 h-6 text-purple-500" />
               <span className="text-xl font-bold">{stats.video}</span>
             </div>
-            <p className="text-gray-400 text-xs mt-1">Vidéos</p>
+            <p className="text-gray-400 text-xs mt-1">{t('stats.videos')}</p>
           </div>
         </div>
       )}
 
-      {/* Zone de drop améliorée */}
+      {/* Zone de drop */}
       <div
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -1486,10 +1474,10 @@ const DocumentsPage: React.FC = () => {
       >
         <Upload className={`w-12 h-12 mx-auto mb-3 ${dragActive ? 'text-indigo-400' : 'text-gray-400'}`} />
         <p className="text-gray-400 mb-2">
-          Glissez-déposez vos fichiers ici pour une transcription automatique
+          {t('upload.title')}
         </p>
         <p className="text-sm text-gray-500 mb-4">
-          Formats supportés : Audio, Vidéo, PDF, DOCX, TXT • Max 500 MB
+          {t('upload.formats')}
         </p>
         <input
           ref={fileInputRef}
@@ -1503,11 +1491,11 @@ const DocumentsPage: React.FC = () => {
           onClick={() => fileInputRef.current?.click()}
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
         >
-          Parcourir les fichiers
+          {t('upload.button')}
         </button>
       </div>
 
-      {/* Barre de filtres améliorée (code conservé avec ajouts) */}
+      {/* Barre de filtres */}
       <div className="flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex-1 flex flex-wrap gap-2">
           {/* Recherche */}
@@ -1515,7 +1503,7 @@ const DocumentsPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
             <input
               type="text"
-              placeholder="Rechercher..."
+              placeholder={t('filters.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -1528,7 +1516,7 @@ const DocumentsPage: React.FC = () => {
             onChange={(e) => setFilterType(e.target.value)}
             className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
           >
-            <option value="all">Tous types</option>
+            <option value="all">{t('filters.allTypes')}</option>
             <option value="audio">Audio</option>
             <option value="video">Vidéo</option>
             <option value="document">Document</option>
@@ -1541,12 +1529,12 @@ const DocumentsPage: React.FC = () => {
             onChange={(e) => setFilterStatus(e.target.value)}
             className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
           >
-            <option value="all">Tous statuts</option>
-            <option value="ready">Prêt</option>
-            <option value="transcribed">Transcrit</option>
-            <option value="processing">En cours</option>
-            <option value="translating">Traduction</option>
-            <option value="pending">En attente</option>
+            <option value="all">{t('filters.allStatus')}</option>
+            <option value="ready">{t('statuses.ready')}</option>
+            <option value="transcribed">{t('statuses.transcribed')}</option>
+            <option value="processing">{t('statuses.processing')}</option>
+            <option value="translating">{t('statuses.translating')}</option>
+            <option value="pending">{t('statuses.pending')}</option>
           </select>
 
           <select
@@ -1554,12 +1542,12 @@ const DocumentsPage: React.FC = () => {
             onChange={(e) => setFilterSector(e.target.value)}
             className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
           >
-            <option value="all">Tous secteurs</option>
-            <option value="medical">Médical</option>
-            <option value="legal">Juridique</option>
-            <option value="business">Business</option>
-            <option value="education">Éducation</option>
-            <option value="media">Média</option>
+            <option value="all">{t('filters.allSectors')}</option>
+            <option value="medical">{t('sectors.medical')}</option>
+            <option value="legal">{t('sectors.legal')}</option>
+            <option value="business">{t('sectors.business')}</option>
+            <option value="education">{t('sectors.education')}</option>
+            <option value="media">{t('sectors.media')}</option>
           </select>
 
           <select
@@ -1567,7 +1555,7 @@ const DocumentsPage: React.FC = () => {
             onChange={(e) => setFilterLanguage(e.target.value)}
             className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
           >
-            <option value="all">Toutes langues</option>
+            <option value="all">{t('filters.allLanguages')}</option>
             <option value="fr">🇫🇷 Français</option>
             <option value="en">🇬🇧 English</option>
             <option value="es">🇪🇸 Español</option>
@@ -1580,12 +1568,12 @@ const DocumentsPage: React.FC = () => {
             onChange={(e) => setSortBy(e.target.value as any)}
             className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
           >
-            <option value="date">Date</option>
-            <option value="name">Nom</option>
-            <option value="size">Taille</option>
+            <option value="date">{t('filters.date')}</option>
+            <option value="name">{t('filters.name')}</option>
+            <option value="size">{t('filters.size')}</option>
           </select>
 
-          {/* Actions groupées (conservées) */}
+          {/* Actions groupées */}
           {selectedDocuments.length > 0 && (
             <>
               <button
@@ -1598,7 +1586,7 @@ const DocumentsPage: React.FC = () => {
                 className="px-3 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg flex items-center gap-2 text-sm transition-all"
               >
                 <Brain className="w-4 h-4" />
-                Transcrire ({selectedDocuments.length})
+                {t('actions.transcribe')} ({selectedDocuments.length})
               </button>
               
               <button
@@ -1606,7 +1594,7 @@ const DocumentsPage: React.FC = () => {
                 className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-2 text-sm transition-all"
               >
                 <Download className="w-4 h-4" />
-                Télécharger ({selectedDocuments.length})
+                {t('actions.download')} ({selectedDocuments.length})
               </button>
               
               <button
@@ -1614,7 +1602,7 @@ const DocumentsPage: React.FC = () => {
                 className="px-3 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-600/50 rounded-lg flex items-center gap-2 text-sm transition-all"
               >
                 <Trash2 className="w-4 h-4" />
-                Supprimer ({selectedDocuments.length})
+                {t('actions.delete')} ({selectedDocuments.length})
               </button>
             </>
           )}
@@ -1648,18 +1636,18 @@ const DocumentsPage: React.FC = () => {
           <button
             onClick={createFolder}
             className="p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-all"
-            title="Nouveau dossier"
+            title={t('actions.newFolder')}
           >
             <FolderPlus className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Contenu principal (conservé avec améliorations) */}
+      {/* Contenu principal */}
       <div className="flex gap-6">
-        {/* Sidebar - Folders avec secteurs */}
+        {/* Sidebar - Folders */}
         <div className="w-64 bg-gray-800 rounded-lg p-4 border border-gray-700 h-fit">
-          <h3 className="font-semibold mb-4">Dossiers par secteur</h3>
+          <h3 className="font-semibold mb-4">{t('folders.title')}</h3>
           <div className="space-y-1">
             <button
               onClick={() => setSelectedFolder(null)}
@@ -1669,7 +1657,7 @@ const DocumentsPage: React.FC = () => {
             >
               <div className="flex items-center gap-2">
                 <FolderOpen className="w-4 h-4" />
-                <span>Tous les documents</span>
+                <span>{t('folders.allDocuments')}</span>
               </div>
             </button>
             
@@ -1704,7 +1692,7 @@ const DocumentsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Documents Grid/List (conservé avec améliorations) */}
+        {/* Documents Grid/List */}
         <div className="flex-1">
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -1763,7 +1751,6 @@ const DocumentsPage: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Métriques IA */}
                     {doc.accuracy && (
                       <div className="flex items-center gap-2 mb-3 text-xs">
                         <span className="flex items-center gap-1">
@@ -1835,7 +1822,7 @@ const DocumentsPage: React.FC = () => {
               })}
             </div>
           ) : (
-            // Vue liste (conservée avec améliorations)
+            // Vue liste
             <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
               <table className="w-full">
                 <thead>
@@ -1854,13 +1841,13 @@ const DocumentsPage: React.FC = () => {
                         className="rounded"
                       />
                     </th>
-                    <th className="px-6 py-4 text-left">Nom</th>
-                    <th className="px-6 py-4 text-left">Secteur</th>
-                    <th className="px-6 py-4 text-left">Type</th>
-                    <th className="px-6 py-4 text-left">Taille</th>
-                    <th className="px-6 py-4 text-left">Métriques</th>
-                    <th className="px-6 py-4 text-left">Statut</th>
-                    <th className="px-6 py-4 text-left">Actions</th>
+                    <th className="px-6 py-4 text-left">{t('table.name')}</th>
+                    <th className="px-6 py-4 text-left">{t('table.sector')}</th>
+                    <th className="px-6 py-4 text-left">{t('table.type')}</th>
+                    <th className="px-6 py-4 text-left">{t('table.size')}</th>
+                    <th className="px-6 py-4 text-left">{t('table.metrics')}</th>
+                    <th className="px-6 py-4 text-left">{t('table.status')}</th>
+                    <th className="px-6 py-4 text-left">{t('table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1901,7 +1888,7 @@ const DocumentsPage: React.FC = () => {
                           {doc.sector && (
                             <div className="flex items-center gap-2">
                               {getSectorIcon(doc.sector)}
-                              <span className="text-sm">{doc.sector}</span>
+                              <span className="text-sm">{t(`sectors.${doc.sector}`)}</span>
                             </div>
                           )}
                         </td>
@@ -1914,7 +1901,7 @@ const DocumentsPage: React.FC = () => {
                         <td className="px-6 py-4">
                           {doc.accuracy && (
                             <div className="flex items-center gap-2 text-xs">
-                              <span title="Précision">{doc.accuracy.toFixed(1)}%</span>
+                              <span title={t('modals.preview.ai.precision')}>{doc.accuracy.toFixed(1)}%</span>
                               {doc.wer && (
                                 <span title="WER" className="text-gray-400">
                                   WER {doc.wer.toFixed(1)}%
@@ -1925,7 +1912,7 @@ const DocumentsPage: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`w-2 h-2 rounded-full inline-block ${getStatusColor(doc.status)}`} />
-                          <span className="ml-2 text-sm">{doc.status}</span>
+                          <span className="ml-2 text-sm">{t(`statuses.${doc.status}`)}</span>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex gap-2">
@@ -1935,7 +1922,7 @@ const DocumentsPage: React.FC = () => {
                                 setShowPreviewModal(true);
                               }}
                               className="p-1 hover:bg-gray-600 rounded"
-                              title="Aperçu"
+                              title={t('actions.preview')}
                             >
                               <Eye className="w-4 h-4" />
                             </button>
@@ -1943,7 +1930,7 @@ const DocumentsPage: React.FC = () => {
                               <button
                                 onClick={() => handleTranscribe(doc)}
                                 className="p-1 hover:bg-gray-600 rounded"
-                                title="Transcrire"
+                                title={t('actions.transcribe')}
                               >
                                 <Brain className="w-4 h-4 text-violet-400" />
                               </button>
@@ -1952,7 +1939,7 @@ const DocumentsPage: React.FC = () => {
                               <button
                                 onClick={() => handleTranslate(doc)}
                                 className="p-1 hover:bg-gray-600 rounded"
-                                title="Traduire"
+                                title={t('actions.translate')}
                               >
                                 <Languages className="w-4 h-4 text-indigo-400" />
                               </button>
@@ -1960,7 +1947,7 @@ const DocumentsPage: React.FC = () => {
                             <button
                               onClick={() => handleDownload([doc])}
                               className="p-1 hover:bg-gray-600 rounded"
-                              title="Télécharger"
+                              title={t('actions.download')}
                             >
                               <Download className="w-4 h-4" />
                             </button>
@@ -1970,14 +1957,14 @@ const DocumentsPage: React.FC = () => {
                                 setShowShareModal(true);
                               }}
                               className="p-1 hover:bg-gray-600 rounded"
-                              title="Partager"
+                              title={t('actions.share')}
                             >
                               <Share2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDelete([doc.id])}
                               className="p-1 hover:bg-gray-600 rounded"
-                              title="Supprimer"
+                              title={t('actions.delete')}
                             >
                               <Trash2 className="w-4 h-4 text-red-400" />
                             </button>
@@ -2007,7 +1994,7 @@ const DocumentsPage: React.FC = () => {
           document={currentDocument}
           onClose={() => setShowPreviewModal(false)}
           onEdit={() => {
-            toast.info('Éditeur en cours de développement');
+            toast.info(t('messages.editorInDevelopment'));
           }}
           onTranscribe={() => handleTranscribe(currentDocument)}
           onTranslate={() => handleTranslate(currentDocument)}
