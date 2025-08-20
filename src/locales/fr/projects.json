@@ -1,90 +1,363 @@
 {
   "title": "Projets",
-  "subtitle": "{{count}} projets trouvés",
-  "newProject": "Nouveau projet",
-  "import": "Importer",
-  "export": "Exporter",
-  "searchPlaceholder": "Rechercher un projet...",
-  "filters": "Filtres",
-  "selectedCount": "{{count}} projet(s) sélectionné(s)",
-  "noOwner": "Non assigné",
-  "progress": "Progression",
-  "accuracy": "Précision",
-  "duration": "Durée",
-  "table": {
-    "name": "Nom",
-    "type": "Type",
-    "status": "Statut",
-    "date": "Date",
-    "accuracy": "Précision",
-    "actions": "Actions"
-  },
-  "type": {
-    "document": "Document",
-    "video": "Vidéo",
-    "audio": "Audio"
-  },
-  "status": {
-    "completed": "Terminé",
-    "processing": "En cours",
-    "ready": "Prêt",
-    "error": "Erreur"
-  },
-  "actions": {
-    "view": "Voir",
-    "edit": "Modifier",
-    "download": "Télécharger",
-    "share": "Partager",
-    "delete": "Supprimer"
-  },
-  "bulkActions": {
+  "subtitle": "{{count}} projet(s) trouvé(s)",
+  "description": "Gérez vos projets de transcription et traduction",
+  
+  "buttons": {
+    "newProject": "Nouveau projet",
+    "import": "Importer",
+    "export": "Exporter", 
     "delete": "Supprimer",
-    "export": "Exporter",
-    "archive": "Archiver"
+    "edit": "Modifier",
+    "share": "Partager",
+    "archive": "Archiver",
+    "duplicate": "Dupliquer",
+    "viewDetails": "Voir les détails",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "create": "Créer",
+    "close": "Fermer",
+    "refresh": "Actualiser",
+    "bulkActions": "Actions groupées"
   },
-  "pagination": {
-    "showing": "Affichage de {{start}} à {{end}} sur {{total}} résultats"
-  },
+
+  "searchPlaceholder": "Rechercher par nom, type ou secteur...",
+  
   "filters": {
     "title": "Filtres avancés",
     "reset": "Réinitialiser",
-    "active": "Filtres actifs",
+    "apply": "Appliquer",
+    "active": "{{count}} filtre(s) actif(s)",
+    "clear": "Effacer tout",
     "statusLabel": "Statut",
     "typeLabel": "Type",
     "languageLabel": "Langue",
     "dateLabel": "Période",
     "sectorLabel": "Secteur",
+    "viewMode": "Mode d'affichage",
+    
     "status": {
       "all": "Tous les statuts",
+      "draft": "Brouillon",
+      "processing": "En traitement",
+      "review": "En révision",
       "completed": "Terminé",
-      "processing": "En cours",
-      "ready": "Prêt",
-      "error": "Erreur"
+      "error": "Erreur",
+      "paused": "En pause",
+      "archived": "Archivé"
     },
+    
     "type": {
       "all": "Tous les types",
-      "document": "Document",
-      "video": "Vidéo",
-      "audio": "Audio"
+      "transcription": "Transcription",
+      "translation": "Traduction",
+      "both": "Transcription + Traduction",
+      "subtitles": "Sous-titrage",
+      "dubbing": "Doublage"
     },
+    
     "language": {
-      "all": "Toutes les langues"
+      "all": "Toutes les langues",
+      "source": "Langue source",
+      "target": "Langue cible"
     },
+    
     "dateRange": {
       "all": "Toutes les dates",
       "today": "Aujourd'hui",
-      "week": "Cette semaine",
-      "month": "Ce mois",
-      "quarter": "Ce trimestre",
-      "year": "Cette année"
+      "yesterday": "Hier",
+      "week": "7 derniers jours",
+      "month": "30 derniers jours",
+      "quarter": "3 derniers mois",
+      "year": "Cette année",
+      "custom": "Personnalisé"
     },
+    
     "sector": {
       "all": "Tous les secteurs",
-      "business": "Affaires",
       "medical": "Médical",
       "legal": "Juridique",
+      "business": "Business",
       "education": "Éducation",
-      "technical": "Technique"
+      "technical": "Technique",
+      "media": "Média",
+      "government": "Gouvernement",
+      "entertainment": "Divertissement",
+      "general": "Général"
     }
+  },
+
+  "table": {
+    "name": "Nom du projet",
+    "type": "Type",
+    "status": "Statut",
+    "language": "Langues",
+    "created": "Créé le",
+    "modified": "Modifié le",
+    "duration": "Durée",
+    "progress": "Progression",
+    "accuracy": "Précision",
+    "owner": "Responsable",
+    "team": "Équipe",
+    "files": "Fichiers",
+    "deadline": "Échéance",
+    "actions": "Actions"
+  },
+
+  "status": {
+    "draft": "Brouillon",
+    "processing": "En traitement",
+    "review": "En révision",
+    "completed": "Terminé",
+    "error": "Erreur",
+    "paused": "En pause",
+    "archived": "Archivé",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté"
+  },
+
+  "type": {
+    "transcription": "Transcription",
+    "translation": "Traduction",
+    "both": "Transcription + Traduction",
+    "subtitles": "Sous-titrage",
+    "dubbing": "Doublage",
+    "document": "Document",
+    "video": "Vidéo",
+    "audio": "Audio"
+  },
+
+  "sectors": {
+    "medical": "Médical",
+    "legal": "Juridique",
+    "business": "Business",
+    "education": "Éducation",
+    "technical": "Technique",
+    "media": "Média",
+    "government": "Gouvernement",
+    "entertainment": "Divertissement",
+    "general": "Général"
+  },
+
+  "modal": {
+    "newProject": "Nouveau projet",
+    "editProject": "Modifier le projet",
+    "deleteProject": "Supprimer le projet",
+    "duplicateProject": "Dupliquer le projet",
+    "shareProject": "Partager le projet",
+    
+    "fields": {
+      "projectName": "Nom du projet",
+      "projectNamePlaceholder": "Ex: Transcription conférence Q1 2025",
+      "selectType": "Type de projet",
+      "selectSector": "Secteur d'activité",
+      "selectLanguage": "Langue source",
+      "targetLanguage": "Langue cible",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez brièvement votre projet...",
+      "deadline": "Date d'échéance",
+      "priority": "Priorité",
+      "assignTo": "Assigner à",
+      "tags": "Tags",
+      "budget": "Budget estimé",
+      "client": "Client",
+      "notes": "Notes internes"
+    },
+    
+    "priority": {
+      "low": "Basse",
+      "medium": "Moyenne",
+      "high": "Haute",
+      "urgent": "Urgente"
+    },
+    
+    "upload": {
+      "title": "Télécharger des fichiers",
+      "dragDrop": "Glissez vos fichiers ici ou cliquez pour parcourir",
+      "dragDropActive": "Relâchez pour télécharger",
+      "supportedFormats": "Formats supportés",
+      "maxSize": "Taille max: {{size}}",
+      "uploading": "Téléchargement en cours...",
+      "uploadComplete": "Téléchargement terminé",
+      "uploadError": "Erreur lors du téléchargement",
+      "fileTypes": {
+        "audio": "Audio (MP3, WAV, M4A, OGG)",
+        "video": "Vidéo (MP4, MOV, AVI, MKV)",
+        "document": "Documents (PDF, DOCX, TXT, SRT)"
+      }
+    },
+    
+    "validation": {
+      "nameRequired": "Le nom du projet est requis",
+      "typeRequired": "Veuillez sélectionner un type",
+      "sectorRequired": "Veuillez sélectionner un secteur",
+      "languageRequired": "Veuillez sélectionner la langue source",
+      "filesRequired": "Au moins un fichier est requis",
+      "invalidFormat": "Format de fichier non supporté",
+      "fileTooLarge": "Le fichier est trop volumineux (max {{size}})"
+    },
+    
+    "confirmation": {
+      "delete": "Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.",
+      "archive": "Voulez-vous archiver ce projet ? Vous pourrez le restaurer plus tard.",
+      "cancel": "Les modifications non sauvegardées seront perdues. Continuer ?",
+      "duplicate": "Voulez-vous créer une copie de ce projet ?"
+    }
+  },
+
+  "empty": {
+    "title": "Aucun projet trouvé",
+    "description": "Commencez par créer votre premier projet ou importez des fichiers existants",
+    "action": "Créer un projet",
+    "importAction": "Importer des fichiers",
+    "noResults": "Aucun résultat pour \"{{query}}\"",
+    "tryAgain": "Essayez avec d'autres mots-clés ou réinitialisez les filtres"
+  },
+
+  "actions": {
+    "view": "Voir",
+    "edit": "Modifier",
+    "download": "Télécharger",
+    "share": "Partager",
+    "delete": "Supprimer",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "duplicate": "Dupliquer",
+    "export": "Exporter",
+    "print": "Imprimer",
+    "favorite": "Ajouter aux favoris",
+    "unfavorite": "Retirer des favoris",
+    "lock": "Verrouiller",
+    "unlock": "Déverrouiller",
+    "assignTo": "Assigner à",
+    "addComment": "Ajouter un commentaire",
+    "viewHistory": "Voir l'historique"
+  },
+
+  "tooltips": {
+    "view": "Voir les détails du projet",
+    "edit": "Modifier les paramètres du projet",
+    "download": "Télécharger tous les fichiers",
+    "share": "Partager avec votre équipe",
+    "delete": "Supprimer définitivement",
+    "archive": "Archiver pour plus tard",
+    "duplicate": "Créer une copie",
+    "export": "Exporter en PDF/Excel",
+    "favorite": "Marquer comme favori",
+    "gridView": "Vue grille",
+    "listView": "Vue liste",
+    "refresh": "Actualiser la liste"
+  },
+
+  "statistics": {
+    "totalProjects": "Total projets",
+    "activeProjects": "Projets actifs",
+    "completedProjects": "Projets terminés",
+    "totalDuration": "Durée totale",
+    "averageAccuracy": "Précision moyenne",
+    "teamMembers": "Membres d'équipe",
+    "storageUsed": "Stockage utilisé",
+    "processingTime": "Temps de traitement"
+  },
+
+  "timeline": {
+    "title": "Historique du projet",
+    "created": "Projet créé",
+    "updated": "Mis à jour",
+    "fileAdded": "Fichier ajouté",
+    "fileRemoved": "Fichier supprimé",
+    "statusChanged": "Statut modifié",
+    "assigned": "Assigné à {{user}}",
+    "commented": "Commentaire ajouté",
+    "shared": "Partagé avec {{user}}",
+    "exported": "Exporté",
+    "completed": "Projet terminé"
+  },
+
+  "collaboration": {
+    "team": "Équipe",
+    "addMember": "Ajouter un membre",
+    "removeMember": "Retirer",
+    "owner": "Propriétaire",
+    "editor": "Éditeur",
+    "viewer": "Lecteur",
+    "invitePending": "Invitation en attente",
+    "lastActive": "Dernière activité",
+    "permissions": "Permissions",
+    "shareLink": "Lien de partage",
+    "copyLink": "Copier le lien",
+    "linkCopied": "Lien copié !",
+    "generateLink": "Générer un lien"
+  },
+
+  "notifications": {
+    "projectCreated": "Projet créé avec succès",
+    "projectUpdated": "Projet mis à jour",
+    "projectDeleted": "Projet supprimé",
+    "projectArchived": "Projet archivé",
+    "projectRestored": "Projet restauré",
+    "projectShared": "Projet partagé avec {{user}}",
+    "projectExported": "Export terminé",
+    "processingStarted": "Traitement démarré",
+    "processingComplete": "Traitement terminé",
+    "processingError": "Erreur lors du traitement",
+    "uploadSuccess": "{{count}} fichier(s) téléchargé(s)",
+    "uploadError": "Erreur lors du téléchargement",
+    "quotaExceeded": "Quota dépassé",
+    "deadlineApproaching": "Échéance proche pour {{project}}"
+  },
+
+  "bulkActions": {
+    "selected": "{{count}} sélectionné(s)",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner",
+    "delete": "Supprimer la sélection",
+    "archive": "Archiver la sélection",
+    "export": "Exporter la sélection",
+    "assignTo": "Assigner à",
+    "changeStatus": "Changer le statut",
+    "addTags": "Ajouter des tags"
+  },
+
+  "pagination": {
+    "showing": "Affichage {{start}}-{{end}} sur {{total}}",
+    "rowsPerPage": "Lignes par page",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "first": "Première",
+    "last": "Dernière",
+    "goToPage": "Aller à la page"
+  },
+
+  "formats": {
+    "duration": {
+      "hours": "{{hours}}h {{minutes}}min",
+      "minutes": "{{minutes}}min {{seconds}}s",
+      "seconds": "{{seconds}}s"
+    },
+    "fileSize": {
+      "bytes": "{{size}} octets",
+      "kb": "{{size}} Ko",
+      "mb": "{{size}} Mo",
+      "gb": "{{size}} Go"
+    },
+    "date": {
+      "short": "DD/MM/YYYY",
+      "long": "DD MMMM YYYY",
+      "relative": "il y a {{time}}"
+    }
+  },
+
+  "errors": {
+    "loadFailed": "Impossible de charger les projets",
+    "saveFailed": "Impossible d'enregistrer les modifications",
+    "deleteFailed": "Impossible de supprimer le projet",
+    "networkError": "Erreur de connexion",
+    "unauthorized": "Vous n'avez pas les permissions nécessaires",
+    "quotaExceeded": "Quota de stockage dépassé",
+    "invalidFile": "Type de fichier non valide",
+    "processingFailed": "Le traitement a échoué",
+    "retry": "Réessayer"
   }
 }

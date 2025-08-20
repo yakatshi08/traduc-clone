@@ -1,0 +1,21 @@
+// C:\PROJETS-DEVELOPPEMENT\traduc-clone\src\locales\fr\transcription.json
+{
+  "editorTitle": "Éditeur de Transcription IA",
+  "precision": "Précision",
+  "wer": "WER",
+  "duration": "Durée",
+  "buttons": {
+    "manual": "Manuel",
+    "autoIA": "Auto IA",
+    "analyze": "Analyser",
+    "save": "Sauvegarder",
+    "export": "Exporter"
+  },
+  "templateSector": "Template sectoriel",
+  "timeline": "Timeline",
+  "segments": "Segments",
+  "assistant": "Assistant IA",
+  "corrections": "Corrections suggérées",
+  "noCorrections": "Aucune correction suggérée",
+  "applyCorrections": "Appliquer les corrections"
+}

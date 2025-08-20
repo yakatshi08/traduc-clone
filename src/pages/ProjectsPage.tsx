@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   FolderOpen, 
   Plus, 
@@ -145,7 +146,7 @@ const CreateProjectModal: React.FC<{
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <FolderPlus className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold">Nouveau Projet</h2>
+            <h2 className="text-xl font-bold">{t('newProject')}</h2>
           </div>
           <button 
             onClick={onClose}
@@ -605,6 +606,7 @@ const ShareProjectModal: React.FC<{
 
 // Composant Principal
 const ProjectsPage: React.FC = () => {
+  const { t } = useTranslation('projects');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -796,7 +798,7 @@ const ProjectsPage: React.FC = () => {
     <div className="max-w-7xl mx-auto">
       {/* En-tête */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Mes Projets</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
         <p className="text-gray-400">Gérez vos projets de transcription et de traduction</p>
       </div>
 
@@ -969,7 +971,7 @@ const ProjectsPage: React.FC = () => {
                     <button
                       onClick={() => handleDeleteProject(project.id)}
                       className="p-1 hover:bg-gray-700 rounded group"
-                      title="Supprimer"
+                      title={t('delete')}
                     >
                       <Trash2 className="w-4 h-4 text-red-400 group-hover:text-red-300" />
                     </button>
@@ -1016,7 +1018,7 @@ const ProjectsPage: React.FC = () => {
                     <button 
                       onClick={() => handleShareProject(project)}
                       className="p-2 hover:bg-gray-700 rounded-lg transition-colors group"
-                      title="Partager"
+                      title={t('share')}
                     >
                       <Share2 className="w-4 h-4 text-gray-400 group-hover:text-white" />
                     </button>
@@ -1087,14 +1089,14 @@ const ProjectsPage: React.FC = () => {
                         <button
                           onClick={() => handleShareProject(project)}
                           className="p-1 hover:bg-gray-600 rounded group"
-                          title="Partager"
+                          title={t('share')}
                         >
                           <Share2 className="w-4 h-4 text-gray-400 group-hover:text-white" />
                         </button>
                         <button 
                           onClick={() => handleDeleteProject(project.id)}
                           className="p-1 hover:bg-gray-600 rounded"
-                          title="Supprimer"
+                          title={t('delete')}
                         >
                           <Trash2 className="w-4 h-4 text-red-400" />
                         </button>

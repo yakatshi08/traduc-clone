@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
   TrendingUp,
@@ -99,6 +100,7 @@ interface AnalyticsData {
 }
 
 const AnalyticsPage: React.FC = () => {
+  const { t } = useTranslation('analytics');
   const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [selectedContent, setSelectedContent] = useState<'all' | 'video' | 'audio' | 'document'>('all');

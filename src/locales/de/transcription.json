@@ -1,0 +1,24 @@
+// C:\PROJETS-DEVELOPPEMENT\traduc-clone\src\locales\de\transcription.json
+{
+  "title": "Transkriptions-Editor IA",
+  "precision": "Präzision",
+  "wer": "WER",
+  "duration": "Dauer",
+  "manual": "Manuell",
+  "autoIA": "Auto IA",
+  "analyze": "Analysieren",
+  "save": "Speichern",
+  "export": "Exportieren",
+  "templateSector": "Branchenvorlage",
+  "timeline": "Zeitleiste",
+  "segments": "Segmente",
+  "corrections": "Vorgeschlagene Korrekturen",
+  "noCorrections": "Keine vorgeschlagenen Korrekturen",
+  "applyCorrections": "Korrekturen anwenden",
+  "assistant": "IA-Assistent",
+  "language": "Sprache",
+  "speaker": {
+    "doctor": "Dr.",
+    "patient": "Patient"
+  }
+}

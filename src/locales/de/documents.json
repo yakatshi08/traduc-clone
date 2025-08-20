@@ -1,0 +1,28 @@
+// C:\PROJETS-DEVELOPPEMENT\traduc-clone\src\locales\de\documents.json
+{
+  "title": "TraducXion Dokumente",
+  "subtitle": "Verwalten Sie Ihre Dateien, Transkriptionen und mehrsprachigen Übersetzungen",
+  "stats": {
+    "total": "Gesamt",
+    "transcribed": "Transkribiert",
+    "translated": "Übersetzt",
+    "space": "Speicher",
+    "precision": "Präzision",
+    "wer": "Durchschn. WER",
+    "audios": "Audios",
+    "videos": "Videos"
+  },
+  "upload": {
+    "title": "Ziehen Sie Ihre Dateien hierher für automatische Transkription",
+    "formats": "Unterstützte Formate: Audio, Video, PDF, DOCX, TXT • Max 500 MB",
+    "button": "Dateien durchsuchen"
+  },
+  "filters": {
+    "search": "Suchen...",
+    "allTypes": "Alle Typen",
+    "allStatus": "Alle Status",
+    "allSectors": "Alle Sektoren",
+    "allLanguages": "Alle Sprachen",
+    "date": "Datum"
+  }
+}
